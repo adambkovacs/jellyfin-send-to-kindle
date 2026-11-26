@@ -4,7 +4,7 @@
     const buttonId = 'sendToKindleButton';
     let timer;
     let dialog;
-    let revision = 0;
+    let view;
 
     function bookId() {
         const hash = window.location.hash;
@@ -134,26 +134,39 @@
     }
 
     async function refresh() {
-        const version = ++revision;
         const id = bookId();
-        const old = document.getElementById(buttonId);
         const page = document.querySelector('.itemDetailPage:not(.hide)');
         const actions = page?.querySelector('.mainDetailButtons, .detailButtons');
-        if (id && old?.dataset.book === id && actions?.contains(old)) return;
-        old?.remove();
+        const apiClient = window.ApiClient;
+        const userId = apiClient?.getCurrentUserId?.();
+        if (view && view.id === id && view.actions === actions && view.apiClient === apiClient && view.userId === userId) {
+            if (view.button && !actions.contains(view.button)) actions.append(view.button);
+            return;
+        }
+        view?.button?.remove();
         dialog?.close();
-        if (!id || !actions || !window.ApiClient) return;
+        view = null;
+        if (!id || !actions || !apiClient) return;
+        const current = { id, actions, apiClient, userId };
+        view = current;
+        const isCurrent = () => view === current && bookId() === id && actions.isConnected
+            && window.ApiClient === apiClient && apiClient.getCurrentUserId?.() === userId;
         try {
-            const user = await window.ApiClient.getCurrentUser();
-            if (!user?.Policy?.IsAdministrator) return;
-            const item = await window.ApiClient.getItem(user.Id, id);
-            if (version !== revision || bookId() !== id || item?.Type !== 'Book' || !actions.isConnected) return;
+            const user = await apiClient.getCurrentUser();
+            if (!user?.Id || !isCurrent()) return;
+            const item = await apiClient.getItem(user.Id, id);
+            if (item?.Type !== 'Book' || !isCurrent()) return;
+            if (!user.Policy?.IsAdministrator) {
+                const options = await request('Books/' + id + '/Options');
+                if (!options.devices?.length || !isCurrent()) return;
+            }
             const button = element('button', 'Send to Kindle');
             button.id = buttonId;
             button.dataset.book = id;
             button.type = 'button';
             button.className = 'button-flat btnAction emby-button';
             button.onclick = () => choose(id, user.Id, button);
+            current.button = button;
             actions.append(button);
         } catch { /* The session or item may no longer be accessible. */ }
     }

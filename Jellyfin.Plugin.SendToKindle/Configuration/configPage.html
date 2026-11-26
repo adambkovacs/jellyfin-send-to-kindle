@@ -19,6 +19,8 @@
         #SendToKindleConfigPage .kindle-details { color: #bdcbc6; }
         #SendToKindleConfigPage .kindle-recipient { padding: 1rem 0; border-bottom: 1px solid #445657; }
         #SendToKindleConfigPage .kindle-recipient legend { font-weight: 700; padding: 0 .4rem; }
+        #SendToKindleConfigPage .kindle-recipient-users { margin: .9rem 0 0; border: 1px solid #445657; }
+        #SendToKindleConfigPage .kindle-recipient-users .kindle-grid { gap: .55rem; }
         #SendToKindleConfigPage [data-field=status][data-error=true] { color: #ffbaad; }
         #SendToKindleConfigPage [hidden] { display: none !important; }
     </style>
@@ -64,7 +66,7 @@
             </section>
             <section class="kindle-section" data-field="recipientSection" aria-labelledby="kindle-recipient-heading" hidden>
                 <h2 id="kindle-recipient-heading">Kindle recipients</h2>
-                <p class="kindle-details">The book page shows labels for enabled recipients.</p>
+                <p class="kindle-details">Readers see the labels of enabled Kindles they can use.</p>
                 <div data-field="recipients"></div>
                 <div class="kindle-actions"><button type="button" data-field="add">Add Kindle</button></div>
             </section>
@@ -91,6 +93,11 @@
                     <label>Device label <input data-recipient="label" maxlength="80" required></label>
                     <label>Send-to-Kindle email <input data-recipient="address" type="email" maxlength="254" required autocomplete="off"></label>
                 </div>
+                <fieldset class="kindle-recipient-users">
+                    <legend>Jellyfin users</legend>
+                    <p class="kindle-details">Leave every user unchecked to allow administrators only. When you select users, only those accounts can use this Kindle.</p>
+                    <div class="kindle-grid" data-recipient="users"></div>
+                </fieldset>
                 <div class="kindle-actions">
                     <label class="kindle-check"><input data-recipient="enabled" type="checkbox"> Enabled</label>
                     <button data-recipient="remove" type="button">Remove Kindle</button>
@@ -112,6 +119,7 @@
                 ...(body && { contentType: 'application/json', data: JSON.stringify(body) })
             });
             let settings;
+            let users = null;
             let busy = false;
             let dirty = false;
             const rows = new Map();
@@ -158,13 +166,45 @@
                 field(clearBox).checked = false;
             }
 
+            function canonicalUserId(id) {
+                return id.replace(/-/g, '').toLowerCase().replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, '$1-$2-$3-$4-$5');
+            }
+
+            function recipientAccess(container, allowedUserIds) {
+                if (!users) {
+                    container.textContent = 'Could not load Jellyfin users. Reload settings to edit access.';
+                    return () => allowedUserIds;
+                }
+
+                const selected = new Set(allowedUserIds.map(canonicalUserId));
+                const choices = new Map(users.map(user => [canonicalUserId(user.Id),
+                    user.Policy?.IsDisabled ? user.Name + ' (disabled)' : user.Name]));
+                for (const id of selected) {
+                    if (!choices.has(id)) choices.set(id, 'Unavailable user (' + id.slice(0, 8) + ')');
+                }
+                const controls = [];
+                for (const [id, name] of choices) {
+                    const label = document.createElement('label');
+                    label.className = 'kindle-check';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = id;
+                    checkbox.checked = selected.has(id);
+                    label.append(checkbox, name);
+                    container.append(label);
+                    controls.push(checkbox);
+                }
+                return () => controls.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
+            }
+
             function appendRecipient(recipient, focus = false) {
                 const fragment = field('recipientTemplate').content.cloneNode(true);
-                const row = fragment.querySelector('fieldset');
+                const row = fragment.querySelector('.kindle-recipient');
                 const control = name => row.querySelector('[data-recipient="' + name + '"]');
                 control('label').value = recipient.label;
                 control('address').value = recipient.address;
                 control('enabled').checked = recipient.enabled;
+                const readAccess = recipientAccess(control('users'), recipient.allowedUserIds ?? []);
                 control('remove').addEventListener('click', () => {
                     rows.delete(row);
                     row.remove();
@@ -176,7 +216,7 @@
                     label: control('label').value,
                     address: control('address').value,
                     enabled: control('enabled').checked,
-                    jellyfinUserId: recipient.jellyfinUserId
+                    allowedUserIds: readAccess()
                 }));
                 field('recipients').append(fragment);
                 if (focus) control('label').focus();
@@ -230,7 +270,18 @@
                 await run(async () => {
                     message('Loading settings…');
                     try {
-                        display(await request('GET'));
+                        const loadUsers = async () => {
+                            try {
+                                return await window.ApiClient.ajax({
+                                    type: 'GET', url: window.ApiClient.getUrl('Users'), dataType: 'json'
+                                });
+                            } catch {
+                                return null;
+                            }
+                        };
+                        const [value, accountList] = await Promise.all([request('GET'), loadUsers()]);
+                        users = Array.isArray(accountList) ? accountList : null;
+                        display(value);
                         message('');
                     } catch {
                         message('Settings could not be loaded. Reload to try again.', true);
@@ -246,7 +297,7 @@
                 changed();
             });
             field('add').addEventListener('click', () => {
-                appendRecipient({ id: '', label: '', address: '', enabled: true, jellyfinUserId: null }, true);
+                appendRecipient({ id: '', label: '', address: '', enabled: true, allowedUserIds: [] }, true);
                 changed();
             });
             field('reload').addEventListener('click', () => {

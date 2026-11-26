@@ -47,7 +47,15 @@ public sealed class KindleSettingsController(
                     passwordConfigured = !string.IsNullOrEmpty(settings.Smtp.Password),
                     passwordFromEnvironment = store.TracksSmtpEnvironmentPassword,
                 },
-                settings.Recipients,
+                recipients = settings.Recipients.Select(recipient => new
+                {
+                    recipient.Id,
+                    recipient.Label,
+                    recipient.Address,
+                    recipient.Enabled,
+                    allowedUserIds = recipient.GrantedUsers,
+                    jellyfinUserId = recipient.GrantedUsers.Count == 1 ? recipient.GrantedUsers[0] : (Guid?)null,
+                }),
                 settings.GoogleBooksEnabled,
                 googleBooksKeyConfigured = !string.IsNullOrEmpty(settings.GoogleBooksApiKey),
                 googleBooksKeyFromEnvironment = store.TracksGoogleEnvironmentKey,

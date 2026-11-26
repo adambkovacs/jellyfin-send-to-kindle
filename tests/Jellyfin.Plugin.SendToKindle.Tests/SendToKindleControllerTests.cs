@@ -52,9 +52,12 @@ public sealed class SendToKindleControllerTests : IDisposable
     }
 
     [Fact]
-    public void Controller_RequiresElevation()
+    public void Delivery_UsesAuthenticatedSessionsAndDiagnosticsRequiresElevation()
     {
-        Assert.Equal(Policies.RequiresElevation, typeof(SendToKindleController).GetCustomAttribute<AuthorizeAttribute>()?.Policy);
+        Assert.Null(Assert.IsType<AuthorizeAttribute>(typeof(SendToKindleController)
+            .GetCustomAttribute<AuthorizeAttribute>()).Policy);
+        Assert.Equal(Policies.RequiresElevation, typeof(SendToKindleController).GetMethod(nameof(SendToKindleController.GetDiagnostics))
+            ?.GetCustomAttribute<AuthorizeAttribute>()?.Policy);
     }
 
     [Fact]
@@ -63,6 +66,21 @@ public sealed class SendToKindleControllerTests : IDisposable
         Authenticate(isApiKey: true);
 
         Assert.Equal(401, Assert.IsType<ObjectResult>(await _controller.GetOptions(BookId, TestContext.Current.CancellationToken)).StatusCode);
+        Assert.Equal(Guid.Empty, _delivery.UserId);
+    }
+
+    [Theory]
+    [InlineData(true, 401)]
+    [InlineData(false, 404)]
+    public async Task OptionsAndEnqueue_RequireAnActiveUserWithDownloadPermission(bool isDisabled, int expectedStatus)
+    {
+        _user.SetPermission(PermissionKind.IsDisabled, isDisabled);
+        _user.SetPermission(PermissionKind.EnableContentDownloading, isDisabled);
+        CancellationToken cancellationToken = TestContext.Current.CancellationToken;
+
+        Assert.Equal(expectedStatus, Assert.IsType<ObjectResult>(await _controller.GetOptions(BookId, cancellationToken)).StatusCode);
+        Assert.Equal(expectedStatus, Assert.IsType<ObjectResult>(await _controller.Enqueue(
+            new EnqueueSendRequest(BookId, "paperwhite", "original", Key), cancellationToken)).StatusCode);
         Assert.Equal(Guid.Empty, _delivery.UserId);
     }
 

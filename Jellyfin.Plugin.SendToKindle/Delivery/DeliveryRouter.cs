@@ -1,6 +1,9 @@
 using System.Text.Json;
 using System.Threading.Channels;
+using Jellyfin.Data;
+using Jellyfin.Database.Implementations.Enums;
 using Jellyfin.Plugin.SendToKindle.Settings;
+using MediaBrowser.Controller.Library;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -8,6 +11,7 @@ namespace Jellyfin.Plugin.SendToKindle.Delivery;
 
 internal sealed class DeliveryRouter(
     IKindleSettingsStore settingsStore,
+    IUserManager userManager,
     RemoteDeliveryClient remote,
     StandaloneDelivery standalone,
     DeliveryJournal journal,
@@ -19,9 +23,13 @@ internal sealed class DeliveryRouter(
     public Task<DeliveryOptions> GetOptionsAsync(Guid userId, Guid bookId, CancellationToken cancellationToken)
     {
         var settings = ReadSettings();
-        return settings.Mode == DeliveryMode.Smtp
-            ? Task.FromResult(standalone.Options(settings, userId, bookId))
-            : remote.GetOptionsAsync(userId, bookId, cancellationToken);
+        if (settings.Mode == DeliveryMode.Smtp)
+        {
+            return Task.FromResult(standalone.Options(settings, userId, bookId));
+        }
+
+        RequireServiceAdministrator(userId);
+        return remote.GetOptionsAsync(userId, bookId, cancellationToken);
     }
 
     public async Task<DeliverySubmission> SubmitAsync(
@@ -34,18 +42,18 @@ internal sealed class DeliveryRouter(
 
         var request = new DeliveryRequest(userId, bookId, deviceId, format, idempotencyKey);
         var pinned = ReadJournal(() => journal.FindByKey(userId, idempotencyKey));
-        var mode = pinned?.Mode;
-        if (mode is null)
+        var settings = pinned is null ? ReadSettings() : null;
+        DeliveryMode mode = pinned?.Mode ?? settings!.Mode;
+        if (mode == DeliveryMode.Service)
         {
-            var settings = ReadSettings();
-            mode = settings.Mode;
-            if (mode == DeliveryMode.Smtp)
-            {
-                standalone.ValidateRequest(settings, request);
-            }
+            RequireServiceAdministrator(userId);
+        }
+        else if (settings is not null)
+        {
+            standalone.ValidateRequest(settings, request);
         }
 
-        var (entry, isReplay) = ReadJournal(() => journal.Reserve(request, mode.Value));
+        var (entry, isReplay) = ReadJournal(() => journal.Reserve(request, mode));
         if (entry.Mode == DeliveryMode.Smtp)
         {
             // Replays return their original receipt even if that device is now disabled.
@@ -57,7 +65,8 @@ internal sealed class DeliveryRouter(
             return new DeliverySubmission(entry.Receipt, isReplay);
         }
 
-        // A retry is always sent to the originally-selected provider, with the original key.
+        // Another request could have pinned this key to the service while settings changed.
+        RequireServiceAdministrator(userId);
         var submission = await remote.SubmitAsync(userId, bookId, deviceId, format, idempotencyKey, cancellationToken)
             .ConfigureAwait(false);
         ReadJournal(() =>
@@ -79,6 +88,7 @@ internal sealed class DeliveryRouter(
 
         if (entry?.Mode == DeliveryMode.Service || ReadSettings().Mode == DeliveryMode.Service)
         {
+            RequireServiceAdministrator(userId);
             return remote.GetStatusAsync(userId, jobId, cancellationToken);
         }
 
@@ -104,6 +114,16 @@ internal sealed class DeliveryRouter(
                 await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken).ConfigureAwait(false);
                 _wake.Writer.TryWrite(true);
             }
+        }
+    }
+
+    private void RequireServiceAdministrator(Guid userId)
+    {
+        var user = userManager.GetUserById(userId);
+        if (user is null || !user.HasPermission(PermissionKind.IsAdministrator)
+            || user.HasPermission(PermissionKind.IsDisabled))
+        {
+            throw new DeliveryException(403, "forbidden");
         }
     }
 

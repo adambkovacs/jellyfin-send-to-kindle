@@ -55,16 +55,22 @@ public sealed class KindleSettingsStore : IKindleSettingsStore
             }
 
             var savedRecipients = saved.Recipients.ToDictionary(recipient => recipient.Id, StringComparer.Ordinal);
-            var recipients = requested.Recipients.Select(recipient => new RecipientSettings
+            var recipients = requested.Recipients.Select(recipient =>
             {
-                Id = savedRecipients.TryGetValue(recipient.Id, out RecipientSettings? previous)
-                    && string.Equals(previous.Address, recipient.Address.Trim(), StringComparison.Ordinal)
-                    ? recipient.Id
-                    : Guid.NewGuid().ToString("D"),
-                Label = recipient.Label.Trim(),
-                Address = recipient.Address.Trim(),
-                Enabled = recipient.Enabled,
-                JellyfinUserId = recipient.JellyfinUserId,
+                RecipientSettings? previous = savedRecipients.GetValueOrDefault(recipient.Id);
+                return new RecipientSettings
+                {
+                    Id = previous is not null
+                        && string.Equals(previous.Address, recipient.Address.Trim(), StringComparison.Ordinal)
+                        ? recipient.Id
+                        : Guid.NewGuid().ToString("D"),
+                    Label = recipient.Label.Trim(),
+                    Address = recipient.Address.Trim(),
+                    Enabled = recipient.Enabled,
+                    // Older dashboards omit AllowedUserIds, so preserve grants on existing recipients.
+                    AllowedUserIds = (recipient.AllowedUserIds ?? previous?.GrantedUsers ?? recipient.GrantedUsers)
+                        .Distinct().ToArray(),
+                };
             }).ToArray();
             SmtpSettings smtp = requested.Smtp;
             var updated = new KindleSettings
@@ -232,7 +238,8 @@ public sealed class KindleSettingsStore : IKindleSettingsStore
         return settings.Recipients.All(recipient => recipient is { Id: not null, Label: not null, Address: not null }
             && (recipient.Id.Length == 0 || existingIds.Remove(recipient.Id))
             && !string.IsNullOrWhiteSpace(recipient.Label) && IsOptionalValue(recipient.Label, 80)
-            && IsAddress(recipient.Address) && recipient.JellyfinUserId != Guid.Empty);
+            && IsAddress(recipient.Address)
+            && recipient.GrantedUsers.All(userId => userId != Guid.Empty));
     }
 
     private static bool IsAddress(string address)

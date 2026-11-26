@@ -62,6 +62,54 @@ public sealed class KindleSettingsTests : IDisposable
     }
 
     [Fact]
+    public void LegacyRecipientGrantSurvivesOlderDashboardSavesAndCanBeExplicitlyCleared()
+    {
+        KindleSettingsStore store = CreateStore();
+        Guid revision = Guid.NewGuid();
+        Guid originalUser = Guid.NewGuid();
+        Guid secondUser = Guid.NewGuid();
+        string recipientId = Guid.NewGuid().ToString("D");
+        string address = SyntheticAddress();
+        var smtp = new SmtpSettings { Host = "smtp.example.invalid", Sender = SyntheticAddress() };
+        string path = Path.Combine(_directory.FullName, "send-to-kindle-private-settings.json");
+        File.WriteAllText(path, JsonSerializer.Serialize(new
+        {
+            Revision = revision,
+            Mode = DeliveryMode.Smtp,
+            Smtp = smtp,
+            Recipients = new[] { new { Id = recipientId, Label = "Reader", Address = address, JellyfinUserId = originalUser } },
+        }));
+
+        Assert.Equal(originalUser, Assert.Single(Assert.Single(store.Read().Recipients).GrantedUsers));
+        RecipientSettings CreateRecipient(IReadOnlyList<Guid>? grants) => new()
+        {
+            Id = recipientId,
+            Label = "Reader",
+            Address = address,
+            AllowedUserIds = grants,
+        };
+
+        KindleSettings CreateUpdate(IReadOnlyList<Guid>? grants) => new()
+        {
+            Revision = store.Read().Revision,
+            Mode = DeliveryMode.Smtp,
+            Smtp = smtp,
+            Recipients = [CreateRecipient(grants)],
+        };
+
+        Assert.Null(store.Save(CreateUpdate([originalUser, secondUser]), false, false));
+        Assert.Null(store.Save(CreateUpdate(null), false, false));
+        RecipientSettings saved = Assert.Single(CreateStore().Read().Recipients);
+        Assert.Equal(recipientId, saved.Id);
+        Assert.Equal(new[] { originalUser, secondUser }, saved.GrantedUsers);
+        Assert.Null(saved.JellyfinUserId);
+
+        Assert.Equal("invalid_settings", store.Save(CreateUpdate([Guid.Empty]), false, false));
+        Assert.Null(store.Save(CreateUpdate([]), false, false));
+        Assert.Empty(Assert.Single(CreateStore().Read().Recipients).GrantedUsers);
+    }
+
+    [Fact]
     public async Task AdminReadRedactsSecretsAndNonAdminOrApiKeyCannotTestConnection()
     {
         KindleSettingsStore store = CreateStore();
@@ -89,6 +137,7 @@ public sealed class KindleSettingsTests : IDisposable
         Assert.Equal(20 * 1024 * 1024, response.RootElement.GetProperty("smtp").GetProperty("maxAttachmentBytes").GetInt64());
         Assert.True(response.RootElement.GetProperty("smtp").GetProperty("passwordConfigured").GetBoolean());
         Assert.True(response.RootElement.GetProperty("googleBooksKeyConfigured").GetBoolean());
+        Assert.Empty(response.RootElement.GetProperty("recipients")[0].GetProperty("allowedUserIds").EnumerateArray());
 
         byte[] body = JsonSerializer.SerializeToUtf8Bytes(new
         {

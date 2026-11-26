@@ -14,7 +14,7 @@ namespace Jellyfin.Plugin.SendToKindle.Controllers;
 
 [ApiController]
 [Route("SendToKindle")]
-[Authorize(Policy = Policies.RequiresElevation)]
+[Authorize]
 [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class SendToKindleController : ControllerBase
 {
@@ -129,6 +129,7 @@ public sealed class SendToKindleController : ControllerBase
     }
 
     [HttpGet("Diagnostics")]
+    [Authorize(Policy = Policies.RequiresElevation)]
     public ActionResult<PluginDiagnosticsResponse> GetDiagnostics()
     {
         return Ok(new PluginDiagnosticsResponse(_webIntegrationStatus.IsRegistered, _webIntegrationStatus.Message));
@@ -149,7 +150,9 @@ public sealed class SendToKindleController : ControllerBase
         return user is not null && !user.HasPermission(PermissionKind.IsDisabled) ? user : null;
     }
 
-    private bool CanSendBook(User user, Guid itemId) => DeliveryBookAccess.Find(_libraryManager, user, itemId) is not null;
+    private bool CanSendBook(User user, Guid itemId) =>
+        user.HasPermission(PermissionKind.EnableContentDownloading)
+        && DeliveryBookAccess.Find(_libraryManager, user, itemId) is not null;
 
     private static bool TryParseBookId(string? value, out Guid id)
     {

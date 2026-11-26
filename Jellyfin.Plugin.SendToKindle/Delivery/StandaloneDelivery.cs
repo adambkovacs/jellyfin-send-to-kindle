@@ -22,10 +22,11 @@ internal sealed class StandaloneDelivery(
 {
     public DeliveryOptions Options(KindleSettings settings, Guid userId, Guid bookId)
     {
-        ValidateAttachment(FindBook(userId, bookId), settings.Smtp.MaxAttachmentBytes);
+        var (user, book) = FindBook(userId, bookId);
+        ValidateAttachment(book, settings.Smtp.MaxAttachmentBytes);
         return new DeliveryOptions(
             settings.Recipients
-                .Where(recipient => IsEligible(recipient, userId))
+                .Where(recipient => IsEligible(recipient, user))
                 .Select(recipient => new DeliveryDevice(recipient.Id, recipient.Label))
                 .ToArray(),
             ["original"]);
@@ -38,8 +39,9 @@ internal sealed class StandaloneDelivery(
             throw UnsupportedFormat();
         }
 
-        ValidateAttachment(FindBook(request.UserId, request.BookId), settings.Smtp.MaxAttachmentBytes);
-        FindRecipient(settings, request);
+        var (user, book) = FindBook(request.UserId, request.BookId);
+        ValidateAttachment(book, settings.Smtp.MaxAttachmentBytes);
+        FindRecipient(settings, request, user);
     }
 
     public void VerifyBookAccess(Guid userId, Guid bookId) => FindBook(userId, bookId);
@@ -51,8 +53,8 @@ internal sealed class StandaloneDelivery(
         try
         {
             var settings = settingsStore.Read();
-            var recipient = FindRecipient(settings, entry.Request);
-            var book = FindBook(entry.Request.UserId, entry.Request.BookId);
+            var (user, book) = FindBook(entry.Request.UserId, entry.Request.BookId);
+            var recipient = FindRecipient(settings, entry.Request, user);
             var (path, contentType) = ValidateAttachment(book, settings.Smtp.MaxAttachmentBytes);
             await using FileStream original = File.OpenRead(path);
             if (original.Length <= 0 || original.Length > settings.Smtp.MaxAttachmentBytes)
@@ -72,8 +74,8 @@ internal sealed class StandaloneDelivery(
             bool accepted = await transport.SendAsync(settings.Smtp, recipient.Address, message, () =>
             {
                 // Authorization or the recipient may have changed during connection setup.
-                FindBook(entry.Request.UserId, entry.Request.BookId);
-                var currentRecipient = FindRecipient(settingsStore.Read(), entry.Request);
+                var (currentUser, _) = FindBook(entry.Request.UserId, entry.Request.BookId);
+                var currentRecipient = FindRecipient(settingsStore.Read(), entry.Request, currentUser);
                 if (!StringComparer.Ordinal.Equals(recipient.Address, currentRecipient.Address))
                 {
                     throw UnknownDevice();
@@ -131,15 +133,15 @@ internal sealed class StandaloneDelivery(
         return message;
     }
 
-    private Book FindBook(Guid userId, Guid bookId)
+    private (User User, Book Book) FindBook(Guid userId, Guid bookId)
     {
         User? user = userManager.GetUserById(userId);
-        if (user is not null && user.HasPermission(PermissionKind.IsAdministrator)
+        if (user is not null
             && !user.HasPermission(PermissionKind.IsDisabled)
             && user.HasPermission(PermissionKind.EnableContentDownloading)
             && DeliveryBookAccess.Find(libraryManager, user, bookId) is { } book)
         {
-            return book;
+            return (user, book);
         }
 
         throw new DeliveryException(404, "unavailable");
@@ -164,13 +166,15 @@ internal sealed class StandaloneDelivery(
         return (path, contentType);
     }
 
-    private static RecipientSettings FindRecipient(KindleSettings settings, DeliveryRequest request) =>
+    private static RecipientSettings FindRecipient(KindleSettings settings, DeliveryRequest request, User user) =>
         settings.Recipients.FirstOrDefault(recipient =>
-            StringComparer.Ordinal.Equals(recipient.Id, request.DeviceId) && IsEligible(recipient, request.UserId))
+            StringComparer.Ordinal.Equals(recipient.Id, request.DeviceId) && IsEligible(recipient, user))
         ?? throw UnknownDevice();
 
-    private static bool IsEligible(RecipientSettings recipient, Guid userId) =>
-        recipient.Enabled && (recipient.JellyfinUserId is null || recipient.JellyfinUserId == userId);
+    private static bool IsEligible(RecipientSettings recipient, User user) =>
+        recipient.Enabled && (recipient.GrantedUsers.Count == 0
+            ? user.HasPermission(PermissionKind.IsAdministrator)
+            : recipient.GrantedUsers.Contains(user.Id));
 
     private static bool IsExplicitRejection(Exception exception) =>
         exception is SmtpCommandException { ErrorCode: SmtpErrorCode.SenderNotAccepted

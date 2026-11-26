@@ -1,7 +1,7 @@
 {
   "name": "Books to Kindle",
   "guid": "5b1ea50d-4836-478b-95d4-1e60d4016b0a",
-  "version": "2.0.0.0",
+  "version": "2.0.0.1",
   "targetAbi": "12.4.0.0",
   "framework": "net10.0",
   "overview": "Send books from Jellyfin Web to your Kindle",
@@ -13,5 +13,5 @@
     "MailKit.dll",
     "MimeKit.Core.dll"
   ],
-  "changelog": "Adds standalone SMTP, device management and optional metadata enrichment. Install under the new plugin ID after removing the earlier variant."
+  "changelog": "Assign a Kindle to selected Jellyfin users for direct SMTP delivery."
 }
