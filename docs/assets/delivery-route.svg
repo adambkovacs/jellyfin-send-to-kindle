@@ -1,57 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" width="960" height="280" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" id="still" viewBox="0 0 960 280" width="960" height="280" role="img" aria-labelledby="title description">
   <title id="title">From Jellyfin Web to Kindle</title>
-  <desc id="description">Jellyfin sends the book through your mail provider to Kindle.</desc>
+  <desc id="description">A page travels from a book through the mail provider to the reader.</desc>
+  <defs>
+    <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse">
+      <path d="M0 5 5 0" stroke="#b69b66" stroke-width=".5" opacity=".35"/>
+    </pattern>
+    <g id="register" fill="none" stroke="#978b6f" stroke-width="1">
+      <circle r="5"/><path d="M-9 0H9M0-9V9"/>
+    </g>
+    <path id="track" d="M178 126C257 46 344 46 424 126S631 201 728 126"/>
+    <g id="leaf" fill="#fff1d5" stroke="#201d1b" stroke-width="1.8" stroke-linejoin="round">
+      <path d="m-12-15 21 2 3 27-24-3z"/><path d="m-7-6 11 1m-11 4 13 1m-12 4 7 1" fill="none"/>
+    </g>
+  </defs>
   <style>
-    .parcel { opacity: 0; }
-    @media (prefers-reduced-motion: no-preference) {
-      .parcel { animation: delivery 4s ease-in-out 0.25s 1 both; }
+    .dispatch,.reply{opacity:0}
+    @media (prefers-reduced-motion:no-preference){
+      :root:not(:target) .dispatch,:root:not(:target) .reply{offset-path:path('M178 126C257 46 344 46 424 126S631 201 728 126');offset-rotate:0deg;animation:carry 7.2s linear infinite}
+      :root:not(:target) .reply{animation-delay:.2s}
+      :root:not(:target) .postmark{transform-origin:424px 126px;animation:stamp 7.2s ease-in-out infinite}
+      :root:not(:target) .signal{animation:signal 7.2s ease-in-out infinite}
     }
-    @media (prefers-reduced-motion: no-preference) {
-      .book-leaf { animation: turn .7s ease-out .15s; transform-origin: 189px 123px; }
-      .envelope-flap { animation: fold .55s ease-in-out 1.85s; transform-origin: 480px 115px; }
-      .reader-lines { animation: typeset .55s ease-out 3.55s; }
-    }
-    @keyframes turn { 50% { transform: skewY(-9deg) scaleX(.2); } }
-    @keyframes fold { 50% { transform: scaleY(-.7); } }
-    @keyframes typeset { from { stroke-dasharray: 0 30; } to { stroke-dasharray: 30 0; } }
-    @keyframes delivery {
-      0% { transform: translateX(0); opacity: 0; }
-      10% { opacity: 1; }
-      44%, 52% { transform: translateX(291px); opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateX(582px); opacity: 0; }
-    }
+    @keyframes carry{0%,6%{offset-distance:0%;opacity:0}12%{opacity:1}38%,49%{offset-distance:45%;opacity:1}79%{opacity:1}85%,100%{offset-distance:100%;opacity:0}}
+    @keyframes stamp{0%,32%,57%,100%{transform:rotate(0deg)}43%{transform:rotate(-22deg)}}
+    @keyframes signal{0%,70%,100%{opacity:.25}83%,90%{opacity:1}}
   </style>
-  <rect width="960" height="280" rx="8" fill="#102727"/>
-  <rect x="12.5" y="12.5" width="935" height="255" rx="3" fill="none" stroke="#739185" stroke-opacity=".48"/>
-  <g fill="none" stroke="#739185" stroke-opacity=".23" stroke-width="1.4">
-    <path d="M13 210c86-30 125 37 219 0s147-26 242 7 119-36 240-17 140 13 233-22"/>
-    <path d="M13 228c86-30 125 37 219 0s147-26 242 7 119-36 240-17 140 13 233-22"/>
-    <path d="M13 246c86-30 125 37 219 0s147-26 242 7 119-36 240-17 140 13 233-22"/>
-    <path d="M13 264c86-30 125 37 219 0s147-26 242 7 119-36 240-17 140 13 233-22"/>
+  <rect width="960" height="280" fill="#1b2224"/>
+  <rect x="9" y="9" width="942" height="262" fill="url(#hatch)" stroke="#a38c63"/>
+  <rect x="19" y="19" width="922" height="242" fill="#1b2224" stroke="#837964" stroke-width=".6"/>
+  <g><use href="#register" x="37" y="37"/><use href="#register" x="923" y="37"/><use href="#register" x="37" y="243"/><use href="#register" x="923" y="243"/></g>
+  <use href="#track" fill="none" stroke="#d7b576" stroke-width="1.7" stroke-dasharray="2 6" transform="translate(28 -11)"/>
+  <g transform="translate(28 -11)">
+    <g class="dispatch"><use href="#leaf" transform="rotate(-14)"/></g>
+    <g class="reply"><use href="#leaf" transform="rotate(12) scale(.92)"/></g>
+    <g fill="#1b2224" stroke="#d8b572" stroke-width="1.5">
+      <circle cx="178" cy="126" r="47"/><circle cx="424" cy="126" r="47"/><circle cx="728" cy="126" r="47"/>
+    </g>
+    <g fill="#f0d9b2" stroke="#1b2224" stroke-width="1.8" stroke-linejoin="round">
+      <path d="m148 107 28 7 27-10 2 37-28 10-29-8z" fill="#de644c"/>
+      <path d="m151 101 25 7 26-8 1 35-26 10-25-8z"/><path d="m177 110 .5 34m-21-33 16 5m-16 2 16 5m-16 2 16 5m8-14 17-6m-17 13 17-6m-17 13 17-6" fill="none"/>
+      <path d="m400 109 48 1-1 32-47-1z"/><path d="m401 111 23 18 23-17m-45 27 14-14m28 14-14-14" fill="none"/>
+      <rect x="711" y="98" width="35" height="55" rx="4"/><rect x="715" y="103" width="27" height="39" rx="1" fill="#d0cdb3"/>
+      <path d="m716 134 8-13 6 6 5-9 6 11v11h-25z" fill="#425450"/><circle cx="721" cy="113" r="3.5" fill="#c55f45" stroke="none"/>
+    </g>
+    <g class="postmark" fill="none" stroke="#f68164"><circle cx="424" cy="126" r="42" stroke-dasharray="3 7"/><path d="m390 99 5-6m57 64 6-6"/></g>
+    <g class="signal" fill="none" stroke="#e67352" stroke-width="2.2"><path d="M756 108q9 13 1 25m5-29q13 16 2 34"/></g>
   </g>
-  <path d="M189 122h582" fill="none" stroke="#d4b581" stroke-opacity=".8" stroke-width="2" stroke-dasharray="4 8"/>
-  <g fill="#132e2d" stroke="#9fa993" stroke-width="1.5">
-    <circle cx="189" cy="122" r="49"/>
-    <circle cx="480" cy="122" r="49"/>
-    <circle cx="771" cy="122" r="49"/>
-  </g>
-  <g fill="none" stroke="#ecce9b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M189 108c-7-6-14-8-23-5v35c9-3 16-1 23 4 7-5 14-7 23-4v-35c-9-3-16-1-23 5Zm0 0v33m-17-28 9 1m-9 8 9 1"/>
-    <path class="book-leaf" d="M190 107q10-7 19-8v30q-10 2-19 9Z" fill="#22403a"/>
-    <rect x="460" y="110" width="40" height="27" rx="2"/>
-    <path class="envelope-flap" d="m461 112 19 14 19-14"/>
-    <rect x="753.5" y="94.5" width="35" height="55" rx="3"/>
-    <path class="reader-lines" d="M760 105h22m-22 6h22m-22 6h19m-19 6h20"/>
-    <path d="M770 141h4"/>
-  </g>
-  <g class="parcel">
-    <circle cx="189" cy="122" r="18" fill="#ff986e" stroke="#132e2d" stroke-width="3"/>
-    <path d="M184 122h10m-4-4 4 4-4 4" fill="none" stroke="#132e2d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
-  <g fill="#fff1d9" font-family="system-ui, sans-serif" font-size="31" font-weight="600" text-anchor="middle">
-    <text x="189" y="210">Jellyfin Web</text>
-    <text x="480" y="210">Mail provider</text>
-    <text x="771" y="210">Kindle</text>
-  </g>
+  <g fill="#f9ebd4" text-anchor="middle" font-family="Georgia,serif" font-size="31"><text x="206" y="213">Jellyfin Web</text><text x="452" y="213">Mail provider</text><text x="756" y="213">Kindle</text></g>
 </svg>

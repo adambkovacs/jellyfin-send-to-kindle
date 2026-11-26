@@ -1,6 +1,9 @@
 # Books to Kindle for Jellyfin
 
-![A coral book and a Kindle connected by a dotted route](docs/assets/reading-jacket.svg)
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/reading-jacket-still.svg">
+  <img src="docs/assets/reading-jacket.svg" alt="A vermilion book and an e-reader share the same engraving">
+</picture>
 
 Send EPUB and PDF books from Jellyfin Web to your Kindle through your own mail provider. Choose a device by name and fill in missing EPUB credits before the book leaves Jellyfin.
 
@@ -8,9 +11,14 @@ Send EPUB and PDF books from Jellyfin Web to your Kindle through your own mail p
 
 ## Fill in missing EPUB credits before sending
 
-An EPUB can have a title and an ISBN but no author credit. Books to Kindle can look up that ISBN in Google Books and add the author to the copy you send. It can also fill in a missing publisher or subject using the same catalog record.
+Books to Kindle can use an EPUB's ISBN to look up its author in Google Books and add the credit to the copy you send. It can also fill in a missing publisher or subject from the same record.
 
-In **SMTP mail server** mode, open **Book metadata**, enable Google Books lookup, and enter your Google Books API key. The search sends the ISBN to Google Books and keeps the book file on your server. The plugin checks the returned ISBN and title against the EPUB and keeps existing credits. If it cannot confirm a single match, it sends the original. Your Jellyfin library file stays intact, and PDFs go through as supplied.
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/edition-proof-still.svg">
+  <img src="docs/assets/edition-proof.svg" alt="A library EPUB's ISBN goes to Google Books, and the matching record supplies the outgoing copy's missing author credit">
+</picture>
+
+In **SMTP mail server** mode, open **Book metadata**, enable Google Books lookup, and enter your Google Books API key. The plugin sends the ISBN to Google Books and checks the returned ISBN and title against the EPUB on your server. It keeps existing credits and sends the original if it cannot confirm a single match. Your library file stays intact, and PDFs go through as supplied.
 
 <details>
 <summary>What did the Jev book identification trial show?</summary>

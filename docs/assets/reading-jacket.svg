@@ -1,117 +1,181 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="460" viewBox="0 0 1200 460" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title description">
   <title id="title">Books to Kindle for Jellyfin</title>
-  <desc id="description">A coral book and a Kindle against an ink-green and parchment book jacket. A small paper parcel follows the route between them.</desc>
+  <desc id="description">A vermilion clothbound book opens beside an e-reader. The engraving on the book appears again on the reader's screen.</desc>
   <defs>
-    <clipPath id="jacket"><rect width="1200" height="460" rx="12"/></clipPath>
+    <clipPath id="jacket"><rect width="1200" height="560" rx="8"/></clipPath>
     <linearGradient id="ink" x2="1" y2="1">
-      <stop stop-color="#101f22"/>
-      <stop offset="1" stop-color="#213a32"/>
+      <stop stop-color="#222a3d"/>
+      <stop offset="1" stop-color="#111625"/>
     </linearGradient>
-    <linearGradient id="parchment" x2=".8" y2="1">
-      <stop stop-color="#f5e6c5"/>
-      <stop offset="1" stop-color="#dba55c"/>
+    <linearGradient id="field" x2=".8" y2="1">
+      <stop stop-color="#dc503a"/>
+      <stop offset="1" stop-color="#9f3028"/>
     </linearGradient>
-    <linearGradient id="cover" x2="1" y2="1">
-      <stop stop-color="#f88d6c"/>
-      <stop offset="1" stop-color="#bb4d3f"/>
+    <linearGradient id="cloth" x2="1" y2="1">
+      <stop stop-color="#c83d2d"/>
+      <stop offset=".12" stop-color="#9b2f26"/>
+      <stop offset=".28" stop-color="#d64a34"/>
+      <stop offset="1" stop-color="#ad3028"/>
     </linearGradient>
-    <pattern id="cloth" width="6" height="6" patternUnits="userSpaceOnUse">
-      <path d="M0 0h6M1 0v6" stroke="#fff2ce" stroke-width=".5" opacity=".16"/>
+    <linearGradient id="pages" x2="1" y2=".3">
+      <stop stop-color="#bca27b"/>
+      <stop offset=".19" stop-color="#f6e8ca"/>
+      <stop offset=".83" stop-color="#ead7ad"/>
+      <stop offset="1" stop-color="#c8ad81"/>
+    </linearGradient>
+    <pattern id="weave" width="5" height="5" patternUnits="userSpaceOnUse">
+      <path d="M0 .5h5m-4 1v3m2-2v2" fill="none" stroke="#f5e8c9" stroke-opacity=".13" stroke-width=".55"/>
+      <path d="M0 3.5h5m-3-3v1m2 2v1" fill="none" stroke="#0b1424" stroke-opacity=".26" stroke-width=".65"/>
     </pattern>
-    <pattern id="stock" width="9" height="9" patternUnits="userSpaceOnUse">
-      <path d="M1 2h1m3 5h1" stroke="#5c3c23" stroke-width="1" opacity=".17"/>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(41)">
+      <path d="M.5 0v6m3 0V0" stroke="#e9c888" stroke-opacity=".2" stroke-width=".8"/>
     </pattern>
-    <pattern id="screen" width="4" height="4" patternUnits="userSpaceOnUse">
-      <path d="M0 0h1m1 2h1" stroke="#294637" stroke-width=".5" opacity=".23"/>
-    </pattern>
-    <path id="spark" d="M0-9Q.8-.8 9 0 .8.8 0 9-.8.8-9 0-.8-.8 0-9Z"/>
+    <g id="engraving" fill="none" stroke="currentColor">
+      <path d="M-56 39V-4a56 59 0 0 1 112 0v43Z" stroke-width="1.8"/>
+      <path d="M-50 33V-4a50 52 0 0 1 100 0v37Z"/>
+      <path d="M-50 18c17-22 35-22 50-13 17-11 35-8 50 3M-50 25c21-12 36-12 53-7 15-5 31-6 47-2M-50 29c22-8 39-7 54-4 18-5 34-4 46-3M-50 33c18-4 36-4 54-2 14-2 29-3 46-3"/>
+      <circle cy="-19" r="12"/>
+      <path d="M0-42v6m0 34v6m-23-23h6m34 0h6m-39-16 5 5m22 22 5 5M-16-3l5-5m22-22 5-5"/>
+    </g>
+    <path id="star" d="M0-10C.8-3 3-.8 10 0 3 .8.8 3 0 10-.8 3-3 .8-10 0-3-.8-.8-3 0-10Z"/>
   </defs>
   <style>
-    .parcel { opacity: 0; }
     @media (prefers-reduced-motion: no-preference) {
-      .parcel {
-        offset-path: path("M827 304 C860 271 804 246 842 211 S889 173 921 162");
-        animation: dispatch 4s cubic-bezier(.36,.04,.38,1) .35s 1 both;
-      }
+      .volume { animation: lift 4.8s cubic-bezier(.34,.07,.28,1) both; }
+      .front-board { animation: open-board 4.8s cubic-bezier(.34,.07,.28,1) both; }
+      .pastedown { animation: show-inside 4.8s cubic-bezier(.34,.07,.28,1) both; }
+      .leaf-one { animation: turn-one 4.8s cubic-bezier(.32,.06,.26,1) both; }
+      .leaf-two { animation: turn-two 4.8s cubic-bezier(.32,.06,.26,1) both; }
+      .loose-sheet { animation: send-sheet 4.8s cubic-bezier(.29,.03,.36,1) both; }
+      .reader { animation: receive 4.8s cubic-bezier(.32,.07,.31,1) both; }
+      .screen-print { animation: ink-screen 4.8s cubic-bezier(.32,.07,.31,1) both; }
     }
-    @keyframes dispatch {
-      0% { offset-distance: 0%; opacity: 0; }
-      12%, 84% { opacity: 1; }
-      100% { offset-distance: 100%; opacity: 0; }
+    @keyframes lift {
+      0%, 100% { transform: translateY(0) rotate(0); }
+      21% { transform: translateY(-18px) rotate(-3deg); }
+      48% { transform: translateY(-27px) rotate(1deg); }
+      71% { transform: translateY(-8px) rotate(-1.5deg); }
+    }
+    @keyframes open-board {
+      0%, 100% { transform: skewY(0deg) scaleX(1); }
+      28%, 53% { transform: skewY(16deg) scaleX(-.67); }
+      75% { transform: skewY(5deg) scaleX(.84); }
+    }
+    @keyframes show-inside {
+      0%, 15%, 70%, 100% { opacity: 0; }
+      18%, 63% { opacity: 1; }
+    }
+    @keyframes turn-one {
+      0%, 17%, 100% { transform: skewY(0deg) scaleX(1); }
+      40%, 55% { transform: skewY(17deg) scaleX(-.56); }
+      71% { transform: skewY(0deg) scaleX(1); }
+    }
+    @keyframes turn-two {
+      0%, 29%, 100% { transform: skewY(0deg) scaleX(1); }
+      51%, 59% { transform: skewY(-20deg) scaleX(-.30); }
+      74% { transform: skewY(0deg) scaleX(1); }
+    }
+    @keyframes send-sheet {
+      0%, 41% { opacity: 0; transform: translate(825px, 232px) rotate(-25deg) scale(.42); }
+      47% { opacity: 1; transform: translate(862px, 166px) rotate(-23deg) scale(.75); }
+      57% { opacity: 1; transform: translate(940px, 103px) rotate(-2deg) scale(1); }
+      66% { opacity: 1; transform: translate(1025px, 155px) rotate(18deg) scale(.70); }
+      74%, 100% { opacity: 0; transform: translate(1064px, 279px) rotate(11deg) scale(.1); }
+    }
+    @keyframes receive {
+      0%, 100% { transform: translate(0, 0) rotate(0); }
+      34% { transform: translate(8px, 7px) rotate(1deg); }
+      71% { transform: translate(15px, -13px) rotate(-1.6deg); }
+      84% { transform: translate(0, 2px) rotate(0); }
+    }
+    @keyframes ink-screen {
+      0%, 14%, 82%, 100% { opacity: 1; }
+      29%, 72% { opacity: .17; }
     }
   </style>
 
   <g clip-path="url(#jacket)">
-    <path fill="url(#ink)" d="M0 0h1200v460H0z"/>
-    <path fill="url(#cloth)" d="M0 0h603v460H0z"/>
-    <path fill="url(#parchment)" d="M603 0h597v460H603z"/>
-    <path fill="url(#stock)" d="M603 0h597v460H603z"/>
-    <rect x="20" y="19" width="1160" height="422" rx="4" fill="none" stroke="#bd8752" stroke-opacity=".67"/>
-    <path d="M39 19v422m554-441v460m10-460v460m8-460v460m550-441v422" stroke="#bd8752" stroke-opacity=".52"/>
-    <path d="M76 94h112m-112 272h455" stroke="#d8ac70" stroke-opacity=".68"/>
-    <path d="M76 94v22m455 228v22" stroke="#d8ac70" stroke-opacity=".68"/>
-    <text x="77" y="187" fill="#fff1d3" font-family="Georgia, 'Times New Roman', serif" font-size="92" letter-spacing="-3.4">Books to</text>
-    <text x="71" y="282" fill="#ff9a7a" font-family="Georgia, 'Times New Roman', serif" font-size="121" font-style="italic" letter-spacing="-4">Kindle</text>
-    <text x="78" y="330" fill="#f4d39e" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="5">FOR JELLYFIN</text>
+    <path d="M0 0h1200v560H0Z" fill="url(#ink)"/>
+    <path d="M0 0h1200v560H0Z" fill="url(#weave)" opacity=".33"/>
+    <path d="M689 0h511v560H617Z" fill="url(#field)"/>
+    <path d="M689 0h511v560H617Z" fill="url(#weave)" opacity=".75"/>
+    <path d="M684 0 612 560m80-560-72 560" stroke="#e9bf78" stroke-opacity=".54"/>
+    <path d="M36 36h1128v488H36Z" fill="none" stroke="#d5a96d" stroke-opacity=".60"/>
+    <path d="M36 59V36h23m1082 0h23v23m0 442v23h-23m-1082 0H36v-23" fill="none" stroke="#edcb89" stroke-width="2"/>
+    <path d="M68 125h489m-489 334h489M68 125v11m489-11v11M68 448v11m489-11v11" fill="none" stroke="#cfa365" stroke-opacity=".77"/>
+    <use href="#star" transform="translate(82 93) scale(.75)" fill="#e5c27e"/>
+    <text x="105" y="101" fill="#e5c27e" font-family="'Avenir Next', Verdana, sans-serif" font-weight="650" font-size="25" letter-spacing="5">FOR JELLYFIN</text>
+    <text x="65" y="253" fill="#f3e7cd" font-family="Baskerville, Georgia, serif" font-size="124" textLength="492" lengthAdjust="spacingAndGlyphs">Books to</text>
+    <text x="63" y="408" fill="#f57b5e" font-family="Baskerville, Georgia, serif" font-size="190" font-style="italic" textLength="490" lengthAdjust="spacingAndGlyphs">Kindle</text>
 
-    <!-- Engraved arcs and rules behind the book and reader. -->
-    <g fill="none" stroke="#875032">
-      <path d="M628 383h507m-507 8h507" opacity=".7"/>
-      <path d="M662 367V224a230 164 0 0 1 460 0v143M676 367V224a216 150 0 0 1 432 0v143" opacity=".5"/>
-      <path d="M720 137a177 125 0 0 1 280-34M789 123a152 107 0 0 1 162-14M683 166l26 8m-38 19 26 5m-30 22 27 2m-27 25h26m414-57 26-8m-18 37 22-4m-18 33 22 1m-22 27 22 4" opacity=".45"/>
+    <g fill="none" stroke="#f1c888">
+      <circle cx="916" cy="281" r="213" stroke-opacity=".55"/>
+      <circle cx="916" cy="281" r="225" stroke-opacity=".41"/>
+      <circle cx="916" cy="281" r="189" stroke-opacity=".3"/>
+      <path d="M687 466h444m-444 10h444M916 56v26m0 398v26M692 281h22m405 0h22" stroke-opacity=".62"/>
     </g>
-    <g fill="#a74c38">
-      <use href="#spark" transform="translate(746 87)"/>
-      <use href="#spark" transform="translate(1095 112) scale(.7)"/>
-      <use href="#spark" transform="translate(1120 326) scale(1.1)"/>
-      <use href="#spark" transform="translate(851 133) scale(.6)"/>
-    </g>
-    <g fill="#815233">
-      <circle cx="766" cy="68" r="2"/><circle cx="720" cy="96" r="2"/>
-      <circle cx="1080" cy="127" r="1.8"/><circle cx="1136" cy="309" r="2"/>
-      <circle cx="1106" cy="344" r="2.2"/><circle cx="818" cy="145" r="1.5"/>
-    </g>
+    <path d="M716 408a213 213 0 0 0 400 0Z" fill="url(#hatch)"/>
+    <use href="#star" transform="translate(1108 101) scale(1.55)" fill="#f4d08b"/>
+    <use href="#star" transform="translate(710 389) scale(.75)" fill="#f4d08b"/>
+    <use href="#star" transform="translate(1125 443) scale(.6)" fill="#f4d08b"/>
 
-    <!-- The sewn cover and visible page block. -->
-    <g transform="rotate(-13 751 272)">
-      <rect x="685" y="185" width="140" height="188" rx="7" fill="#4c2926" opacity=".27" transform="translate(7 7)"/>
-      <rect x="682" y="179" width="144" height="188" rx="7" fill="#742f2d"/>
-      <path d="M696 342h128v20H696a10 10 0 0 1 0-20z" fill="#ffe7ba"/>
-      <path d="M697 347h126m-126 5h120m-120 5h125" stroke="#c88a56" opacity=".8"/>
-      <rect x="682" y="171" width="144" height="174" rx="7" fill="url(#cover)"/>
-      <rect x="682" y="171" width="144" height="174" rx="7" fill="url(#cloth)"/>
-      <path d="M704 172v172m-10-166v159" stroke="#782f31" stroke-width="2" opacity=".68"/>
-      <path d="M683 197h20m-20 12h20m-20 100h20m-20 12h20" stroke="#702a2b" stroke-width="2"/>
-      <rect x="714" y="184" width="101" height="144" rx="3" fill="none" stroke="#f9d5a0" opacity=".82"/>
-      <rect x="718" y="189" width="93" height="134" rx="2" fill="none" stroke="#f9d5a0" opacity=".53"/>
-      <ellipse cx="764" cy="252" rx="33" ry="44" fill="#672e2f" fill-opacity=".36" stroke="#f9d5a0"/>
-      <path d="M764 246q-10-7-20-4v21q12-3 20 5 8-8 20-5v-21q-10-3-20 4v22m-21 10h42m-34 8h26" fill="none" stroke="#ffe3b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <use href="#spark" transform="translate(764 224) scale(.6)" fill="#ffe3b0"/>
-      <path d="M800 351h11v32l-5.5-5.5-5.5 5.5z" fill="#1c4940"/>
+    <g transform="translate(986 151) rotate(12)">
+      <g class="reader motion">
+        <rect x="8" y="11" width="152" height="250" rx="15" fill="#3b1a28" opacity=".53"/>
+        <rect width="152" height="250" rx="14" fill="#151b2b" stroke="#78604f" stroke-width="1.3"/>
+        <rect x="5" y="5" width="142" height="239" rx="10" fill="none" stroke="#6c7180" stroke-opacity=".65"/>
+        <rect x="13" y="14" width="126" height="204" rx="3" fill="#e4d8b8"/>
+        <rect x="13" y="14" width="126" height="204" rx="3" fill="url(#weave)"/>
+        <g class="screen-print motion" color="#3c4854">
+          <use href="#engraving" transform="translate(76 100) scale(.82)"/>
+          <path d="M33 155h86m-86 11h86m-86 11h69m-69 11h79m-79 11h62" stroke="#59616b" stroke-width="1.7"/>
+        </g>
+        <path d="M69 232h14" stroke="#8d8e96" stroke-width="2" stroke-linecap="round"/>
+      </g>
     </g>
 
-    <!-- The ink screen repeats the sun and hills stamped on the jacket. -->
-    <g transform="rotate(9 995 253)">
-      <rect x="929" y="143" width="147" height="224" rx="16" fill="#4e3729" opacity=".26" transform="translate(7 7)"/>
-      <rect x="925" y="136" width="150" height="222" rx="15" fill="#102524" stroke="#112525" stroke-width="3"/>
-      <rect x="930" y="141" width="140" height="212" rx="11" fill="none" stroke="#668174"/>
-      <rect x="938" y="152" width="124" height="177" rx="3" fill="#e4e4bf"/>
-      <rect x="938" y="152" width="124" height="177" rx="3" fill="url(#screen)"/>
-      <rect x="947" y="161" width="106" height="158" rx="1" fill="none" stroke="#617d68" stroke-opacity=".65"/>
-      <circle cx="1004" cy="200" r="17" fill="#ac7652"/>
-      <path d="M948 230q18-18 37-12 11 4 27 2 20-4 40 7v21H948z" fill="#729080"/>
-      <path d="M948 240q21-12 41-5 19 7 36 0 12-5 27-.5v13H948z" fill="#34584d"/>
-      <path d="M959 270h82m-82 12h82m-82 12h61m-61 12h70" stroke="#506a59" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M994 342h12" stroke="#b4bf9f" stroke-width="2" stroke-linecap="round"/>
+    <g transform="translate(785 122) rotate(-12 0 155)">
+      <g class="volume motion">
+        <path d="M12 17h210q11 0 11 10v296q0 11-11 11H12q-9 0-9-11V29q0-12 9-12Z" fill="#521f27" opacity=".64" transform="translate(8 8)"/>
+        <path d="M10 13h209q12 0 12 12v292q0 12-12 12H10q-10 0-10-10V26q0-13 10-13Z" fill="#7f2827" stroke="#51212b"/>
+        <path d="M8 14h219v299q0 10-10 10H8Z" fill="url(#pages)"/>
+        <path d="M14 311h211m-211 4h207m-207 4h201m4-298v288m4-284v283" fill="none" stroke="#99714f" stroke-opacity=".76"/>
+        <path d="M0 0Q98 7 217 0v310Q109 302 0 310Z" fill="url(#pages)" stroke="#b28a65"/>
+        <use href="#engraving" transform="translate(111 110) scale(.92)" color="#84624d"/>
+        <path d="M30 160h162m-162 13h162m-162 13h143m-143 24h162m-162 13h162m-162 13h119" stroke="#84624d" stroke-opacity=".65" stroke-width="2"/>
+        <g class="leaf-one motion">
+          <path d="M0 0Q108-8 217 0v310Q106 302 0 310Z" fill="url(#pages)" stroke="#b28a65"/>
+          <use href="#engraving" transform="translate(110 115) scale(.85)" color="#7d5945"/>
+          <path d="M33 178h160m-160 13h160m-160 13h147m-147 13h160m-160 13h118" stroke="#946f55" stroke-opacity=".8" stroke-width="2"/>
+        </g>
+        <g class="leaf-two motion">
+          <path d="M0 0Q98 7 215 0v309Q102 315 0 309Z" fill="url(#pages)" stroke="#a47958"/>
+          <path d="M26 72h162m-162 13h162m-162 13h143m-143 27h162m-162 13h162m-162 13h162m-162 13h118m-118 27h162m-162 13h162m-162 13h139" stroke="#846247" stroke-opacity=".68" stroke-width="2"/>
+        </g>
+        <g class="front-board motion">
+          <rect width="222" height="310" rx="7" fill="url(#cloth)" stroke="#ee7c5c" stroke-width="1.2"/>
+          <rect width="222" height="310" rx="7" fill="url(#weave)" opacity=".88"/>
+          <path d="M20 2v306m-9-304v301" stroke="#761f22" stroke-width="2" opacity=".76"/>
+          <path d="M17 49h-16m16 8h-16m16 193h-16m16 8h-16" stroke="#e9aa69" stroke-opacity=".77" stroke-width="2"/>
+          <rect x="31" y="15" width="176" height="280" rx="2" fill="none" stroke="#e9bc76" stroke-width="1.4"/>
+          <rect x="37" y="21" width="164" height="268" rx="1" fill="none" stroke="#e9bc76" stroke-opacity=".65"/>
+          <use href="#star" fill="#efd098" transform="translate(119 79) scale(.9)"/>
+          <use href="#engraving" transform="translate(119 156) scale(1.15)" color="#efd098"/>
+          <path d="M61 230h116m-102 7h88" stroke="#efd098" stroke-opacity=".85"/>
+          <use href="#star" fill="#efd098" transform="translate(119 261) scale(.56)"/>
+          <g class="pastedown motion" opacity="0">
+            <rect x="1" y="1" width="220" height="308" rx="7" fill="#992e27"/>
+            <rect x="17" y="13" width="191" height="285" rx="2" fill="#dca96e"/>
+            <rect x="17" y="13" width="191" height="285" rx="2" fill="url(#hatch)"/>
+            <path d="M28 24h169v263H28Z" fill="none" stroke="#8b4c39"/>
+          </g>
+        </g>
+      </g>
     </g>
 
-    <!-- The whole route stays visible when motion is disabled. -->
-    <path d="M827 304c33-33-23-58 15-93 26-23 47-38 79-49" fill="none" stroke="#984333" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 6"/>
-    <path d="m914 160 8 2-5 6" fill="none" stroke="#984333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    <g class="parcel">
-      <circle r="16" fill="#f7e5bf" stroke="#a34b38" stroke-width="1.4"/>
-      <path d="M-6-8H2L6-4V8H-6Z" fill="#a34b38"/>
-      <path d="M1-7v4h4m-8 2h6m-6 3h6m-6 3h4" stroke="#f8e2b6" stroke-width="1" fill="none"/>
+    <g class="loose-sheet motion" opacity="0">
+      <path d="M-28-36h42l14 13v59h-56Z" fill="#f6e6be" stroke="#8a503e" stroke-width="1.6"/>
+      <path d="M14-36v13h14m-43 9h30m-30 7h30m-30 7h23m-23 7h30m-30 7h25" fill="none" stroke="#8a503e" stroke-width="1.4"/>
     </g>
   </g>
 </svg>

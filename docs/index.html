@@ -6,7 +6,7 @@
   <title>Jellyfin Send to Kindle | Books to Kindle for Jellyfin 12.4</title>
   <meta name="description" content="Send EPUB and PDF books from Jellyfin Web to your Kindle using your own SMTP account. Install Books to Kindle for Jellyfin 12.4.">
   <link rel="canonical" href="https://adambkovacs.github.io/jellyfin-send-to-kindle/">
-  <meta name="theme-color" content="#f5eddd">
+  <meta name="theme-color" content="#151b2b">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Jellyfin Send to Kindle">
   <meta property="og:title" content="Jellyfin Send to Kindle">
@@ -16,15 +16,16 @@
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="600">
-  <meta property="og:image:alt" content="Jellyfin to Kindle, with a Kindle beside a window overlooking the water">
+  <meta property="og:image:alt" content="From Jellyfin to Kindle beside an illustration of a book and an e-reader">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Jellyfin Send to Kindle">
   <meta name="twitter:description" content="Send EPUB and PDF books from Jellyfin Web to your Kindle using your own SMTP account. Install Books to Kindle for Jellyfin 12.4.">
   <meta name="twitter:image" content="https://adambkovacs.github.io/jellyfin-send-to-kindle/assets/social-card.jpg">
-  <meta name="twitter:image:alt" content="Jellyfin to Kindle, with a Kindle beside a window overlooking the water">
+  <meta name="twitter:image:alt" content="From Jellyfin to Kindle beside an illustration of a book and an e-reader">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/baskervville.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="site.css">
+  <script src="motion.js" defer></script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -52,6 +53,9 @@
         <a href="#workflow">Send a book</a>
         <a href="#setup">Setup</a>
         <a class="nav-source" href="https://github.com/adambkovacs/jellyfin-send-to-kindle">GitHub <span aria-hidden="true">↗</span></a>
+        <button class="motion-toggle" type="button" aria-pressed="true" hidden>
+          <span class="motion-indicator" aria-hidden="true"></span> Motion
+        </button>
       </nav>
     </div>
   </header>
@@ -61,70 +65,75 @@
       <div class="frame hero-inner">
         <div class="hero-copy">
           <p class="kicker">A plugin for Jellyfin 12.4</p>
-          <h1 id="hero-title">From Jellyfin<br> <em>to Kindle</em></h1>
+          <h1 id="hero-title"><span>From</span> <span>Jellyfin</span> <em>to Kindle</em></h1>
           <p class="hero-lede">Send EPUB and PDF books from Jellyfin Web to your Kindle using your own SMTP account. Choose which Jellyfin users can send to each device.</p>
           <div class="actions">
             <a class="button" href="https://github.com/adambkovacs/jellyfin-send-to-kindle/releases/tag/v2.0.0.1">Download v2.0.0.1 <span aria-hidden="true">↓</span></a>
             <a class="text-link" href="#setup">Check requirements</a>
           </div>
         </div>
-        <div class="jacket" aria-hidden="true">
-          <div class="jacket-window">
-            <img class="hero-image" src="assets/reading-room.webp" width="1440" height="720" alt="" fetchpriority="high">
-          </div>
-          <picture>
-            <source srcset="assets/jacket-seal.svg#still" media="(prefers-reduced-motion: reduce)">
-            <img class="jacket-seal" src="assets/jacket-seal.svg" width="184" height="184" alt="">
-          </picture>
-        </div>
+        <figure class="press-plate">
+          <img src="assets/press-to-reader-still.svg" data-motion-source="assets/press-to-reader.svg"
+               width="1280" height="620" alt="Pages from an open book travel into a Kindle" fetchpriority="high">
+        </figure>
       </div>
     </section>
 
     <section class="workflow frame" id="workflow" aria-labelledby="workflow-title">
-      <div class="section-intro workflow-intro">
+      <div class="section-intro workflow-intro" data-reveal>
         <h2 id="workflow-title">Send a book</h2>
         <p>Open a book you can download in Jellyfin Web. The <strong>Send to Kindle</strong> dialog lists the devices you can use and the formats available for that book.</p>
       </div>
       <div class="screens">
-        <figure class="screen screen-action">
+        <figure class="screen screen-action" data-reveal>
           <a href="assets/book-action.png" aria-label="Open full-size book detail screenshot">
             <img src="assets/book-action.png" width="1516" height="396" alt="The Send to Kindle button on a Jellyfin book page" loading="lazy">
           </a>
           <figcaption>Select <strong>Send to Kindle</strong> on the book page.</figcaption>
         </figure>
-        <figure class="screen screen-chooser">
+        <figure class="screen screen-chooser" data-reveal>
           <a href="assets/chooser.png" aria-label="Open full-size Send to Kindle dialog screenshot">
             <img src="assets/chooser.png" width="404" height="544" alt="The Send to Kindle dialog with device and format selectors" loading="lazy">
           </a>
           <figcaption>Choose a Kindle, then select <strong>Send</strong>.</figcaption>
         </figure>
-        <div class="route">
+        <div class="route" data-reveal>
           <div class="route-copy">
             <h3>Check delivery</h3>
             <p>The dialog shows <strong>Accepted by mail provider</strong> once your provider accepts the email. Open the book in your Kindle library to confirm it arrived.</p>
           </div>
-          <img src="assets/delivery-route.svg" alt="Jellyfin sends the book through your mail provider to Kindle" width="960" height="280" loading="lazy">
+          <img class="route-plate" src="assets/delivery-route-still.svg" data-motion-source="assets/delivery-route.svg"
+               alt="Jellyfin sends the book through your mail provider to Kindle" width="960" height="280" loading="lazy">
         </div>
       </div>
     </section>
 
-    <section class="frame metadata-feature" aria-labelledby="metadata-title">
-      <div class="section-intro">
-        <h2 id="metadata-title">Send the author credit with the book</h2>
-        <p>Some EPUBs arrive with a title and ISBN but no author. Books to Kindle can match that ISBN and title in Google Books and fill in the author, publisher or subject on the copy you send. Your library keeps the original file.</p>
+    <section class="metadata-feature" aria-labelledby="metadata-title">
+      <div class="frame metadata-grid">
+        <div class="metadata-copy" data-reveal>
+          <h2 id="metadata-title">Send the author credit with the book</h2>
+          <p>Some EPUBs arrive with a title and ISBN but no author. Books to Kindle can match that ISBN and title in Google Books and fill in the author, publisher or subject on the copy you send. Your library keeps the original file.</p>
+          <p>In SMTP mode, turn on Google Books lookup under <strong>Book metadata</strong> and enter your API key. If the match is uncertain, the plugin sends the book as it is.</p>
+        </div>
+        <figure class="proof-plate" data-reveal>
+          <img src="assets/edition-proof-still.svg" data-motion-source="assets/edition-proof.svg"
+               width="960" height="580" alt="An EPUB with a missing author credit is matched by ISBN and title. Google Books metadata is added to the outgoing copy." loading="lazy">
+        </figure>
       </div>
-      <p>In SMTP mode, turn on Google Books lookup under <strong>Book metadata</strong> and enter your API key. If the match is uncertain, the plugin sends the book as it is.</p>
     </section>
 
     <section class="setup" id="setup" aria-labelledby="setup-title">
       <div class="frame setup-grid">
-        <div class="section-intro setup-intro">
+        <div class="setup-intro" data-reveal>
           <h2 id="setup-title">Install and configure</h2>
           <p>Use Jellyfin Server 12.4.0 with Jellyfin Web. Install <strong>Books to Kindle</strong> from the plugin catalog.</p>
           <a class="button button-outline" href="https://github.com/adambkovacs/jellyfin-send-to-kindle/tree/books/12.4#install">Read the install guide <span aria-hidden="true">↗</span></a>
           <a class="catalog-link" href="manifest.json">Jellyfin catalog manifest <span aria-hidden="true">↗</span></a>
+          <figure class="reading-room" aria-hidden="true">
+            <img src="assets/reading-room.webp" alt="" width="1440" height="720" loading="lazy">
+          </figure>
         </div>
-        <div>
+        <div data-reveal>
           <dl class="requirements">
             <div>
               <dt>File Transformation</dt>
@@ -145,8 +154,8 @@
     </section>
 
     <section class="faq frame" aria-labelledby="faq-title">
-      <h2 id="faq-title">Common questions</h2>
-      <div class="faq-list">
+      <h2 id="faq-title" data-reveal>Common questions</h2>
+      <div class="faq-list" data-reveal>
         <details>
           <summary>Can Jev identify a book or its edition?</summary>
           <p>In a separate PDF trial, TypeSafe Jev identified the work from the title and author. It left the PDF edition open because the available ISBNs belonged to the hardcover and EPUB. A catalog check gave the same answer. Jev remains experimental. The plugin ships with Google Books lookup for EPUBs.</p>

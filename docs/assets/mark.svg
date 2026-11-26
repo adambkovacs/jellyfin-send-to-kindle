@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+<svg id="still" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
   <style>
     @media (prefers-reduced-motion: no-preference) {
-      .wave { animation: draw-wave 0.9s ease-out 0.15s 1 both; }
+      :root:not(:target) .wave { animation: draw-wave 0.9s ease-out 0.15s 1 both; }
     }
     @keyframes draw-wave {
       from { stroke-dasharray: 30; stroke-dashoffset: 30; }
