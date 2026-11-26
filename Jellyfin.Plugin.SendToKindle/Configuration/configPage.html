@@ -1,319 +1,314 @@
-<div id="SendToKindleConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
-    <div data-role="content">
-        <div class="content-primary">
-            <form id="SendToKindleConfigForm">
-                <h1>Send to Kindle</h1>
-
-                <h2>SMTP</h2>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="SmtpHost">Host</label>
-                    <input id="SmtpHost" is="emby-input" type="text" autocomplete="off" />
-                </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="SmtpPort">Port</label>
-                    <input id="SmtpPort" is="emby-input" type="number" min="1" max="65535" value="587" required />
-                </div>
-                <div class="selectContainer">
-                    <label class="selectLabel" for="SmtpSecurity">Security</label>
-                    <select id="SmtpSecurity" is="emby-select">
-                        <option value="0">Auto</option>
-                        <option value="1" selected>STARTTLS</option>
-                        <option value="2">TLS on connect</option>
-                        <option value="3">None</option>
+<div id="SendToKindleConfigPage" data-role="page" class="page type-interior pluginConfigurationPage">
+    <style>
+        #SendToKindleConfigPage .kindle-settings { max-width: 64rem; margin: 0 auto; padding: clamp(1rem, 4vw, 3rem); color: #f4f3ee; }
+        #SendToKindleConfigPage .kindle-overview { background: #142723; border-left: 4px solid #91d9b7; padding: clamp(1.1rem, 4vw, 2.3rem); margin-bottom: 1.2rem; }
+        #SendToKindleConfigPage h1 { font: 600 clamp(2rem, 6vw, 3rem)/1.1 Georgia, serif; margin: 0 0 .6rem; }
+        #SendToKindleConfigPage h2 { font-size: 1.2rem; margin: 0 0 .5rem; }
+        #SendToKindleConfigPage p { margin: .25rem 0 .85rem; line-height: 1.5; }
+        #SendToKindleConfigPage .kindle-section { background: #1d2527; border: 1px solid #445657; padding: clamp(1rem, 3vw, 1.7rem); margin-bottom: 1rem; }
+        #SendToKindleConfigPage .kindle-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); align-items: end; }
+        #SendToKindleConfigPage .kindle-settings label:not(.kindle-check) { display: grid; gap: .4rem; font-weight: 600; }
+        #SendToKindleConfigPage .kindle-settings input:not([type=checkbox]), #SendToKindleConfigPage select { width: 100%; min-width: 0; box-sizing: border-box; border: 1px solid #627775; border-radius: .25rem; padding: .6rem .8rem; color: #fff; background: #111a1c; font: inherit; font-weight: 400; }
+        #SendToKindleConfigPage .kindle-check { display: flex; align-items: center; gap: .4rem; font-weight: 500; }
+        #SendToKindleConfigPage .kindle-settings button { cursor: pointer; font: inherit; min-height: 2.65rem; border: 1px solid #91d9b7; border-radius: .25rem; background: transparent; color: #b4edcf; padding: .5rem .8rem; }
+        #SendToKindleConfigPage .kindle-settings button[type=submit] { background: #91d9b7; color: #122522; font-weight: 700; }
+        #SendToKindleConfigPage .kindle-settings button:disabled { cursor: default; opacity: .58; }
+        #SendToKindleConfigPage .kindle-settings :focus-visible { outline: 2px solid #e5ce88; outline-offset: 3px; }
+        #SendToKindleConfigPage .kindle-settings a { color: #b4edcf; }
+        #SendToKindleConfigPage .kindle-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .7rem; margin-top: .9rem; }
+        #SendToKindleConfigPage .kindle-details { color: #bdcbc6; }
+        #SendToKindleConfigPage .kindle-recipient { padding: 1rem 0; border-bottom: 1px solid #445657; }
+        #SendToKindleConfigPage .kindle-recipient legend { font-weight: 700; padding: 0 .4rem; }
+        #SendToKindleConfigPage [data-field=status][data-error=true] { color: #ffbaad; }
+        #SendToKindleConfigPage [hidden] { display: none !important; }
+    </style>
+    <div data-role="content" class="content-primary kindle-settings">
+        <header class="kindle-overview">
+            <h1>Books to Kindle</h1>
+            <p>Choose how Jellyfin delivers books and set up the Kindles you send to.</p>
+        </header>
+        <form novalidate>
+            <section class="kindle-section" aria-labelledby="kindle-delivery-heading">
+                <h2 id="kindle-delivery-heading">Delivery</h2>
+                <label>Method
+                    <select data-field="mode">
+                        <option value="Service">External delivery service</option>
+                        <option value="Smtp">SMTP mail server</option>
                     </select>
+                </label>
+                <p data-field="service" class="kindle-details">Set the service URL and access token in the Jellyfin server environment. Your delivery service manages recipients and formats.</p>
+                <div data-field="smtp" hidden>
+                    <div class="kindle-actions">
+                        <button type="button" data-field="purelymail">Use Purelymail settings</button>
+                        <a href="https://support.purelymail.com/support/solutions/articles/159000430778-server-settings-imap-smtp-pop3-and-managesieve-protocols">Purelymail setup</a>
+                    </div>
+                    <p class="kindle-details">For any other provider, enter its SMTP settings below. Add the sender to <a href="https://digprjsurvey.amazon.com/csad/help/node/GX9XLEVV8G4DB28H">Amazon’s approved sender list</a> for each Kindle.</p>
+                    <div class="kindle-grid">
+                        <label>SMTP host <input data-field="host" maxlength="253" inputmode="url" autocomplete="off"></label>
+                        <label>Port <input data-field="port" type="number" min="1" max="65535"></label>
+                        <label>Connection security <select data-field="transport"><option value="Tls">TLS</option><option value="StartTls">STARTTLS</option></select></label>
+                        <label>Sender email <input data-field="sender" type="email" maxlength="254" autocomplete="off"></label>
+                        <label>SMTP username <input data-field="username" maxlength="254" autocomplete="off"></label>
+                        <label>SMTP password <input data-field="password" type="password" maxlength="1024" autocomplete="new-password"></label>
+                        <label>Attachment limit (MiB) <input data-field="limit" type="number" min="1" max="50" step="1"></label>
+                    </div>
+                    <div class="kindle-actions">
+                        <span class="kindle-details" data-field="passwordStatus"></span>
+                        <label class="kindle-check" data-field="passwordClearRow" hidden><input data-field="passwordClear" type="checkbox"> Remove saved password</label>
+                    </div>
+                    <div class="kindle-actions">
+                        <button type="button" data-field="connection" disabled>Test saved connection</button>
+                        <span class="kindle-details">Checks TLS and sign-in without sending email.</span>
+                    </div>
                 </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="SmtpUsername">Username</label>
-                    <input id="SmtpUsername" is="emby-input" type="text" autocomplete="username" />
+            </section>
+            <section class="kindle-section" data-field="recipientSection" aria-labelledby="kindle-recipient-heading" hidden>
+                <h2 id="kindle-recipient-heading">Kindle recipients</h2>
+                <p class="kindle-details">The book page shows labels for enabled recipients.</p>
+                <div data-field="recipients"></div>
+                <div class="kindle-actions"><button type="button" data-field="add">Add Kindle</button></div>
+            </section>
+            <section class="kindle-section" data-field="enrichment" aria-labelledby="kindle-enrichment-heading" hidden>
+                <h2 id="kindle-enrichment-heading">Book metadata</h2>
+                <label class="kindle-check"><input data-field="googleEnabled" type="checkbox"> Look up metadata with Google Books</label>
+                <p class="kindle-details">When a book contains an ISBN, Jellyfin can send that ISBN to Google Books over HTTPS. If the lookup fails, Jellyfin sends the original file.</p>
+                <label>Google Books API key <input data-field="googleKey" type="password" maxlength="256" autocomplete="new-password"></label>
+                <div class="kindle-actions">
+                    <span class="kindle-details" data-field="googleStatus"></span>
+                    <label class="kindle-check" data-field="googleClearRow" hidden><input data-field="googleClear" type="checkbox"> Remove saved key</label>
                 </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="SmtpPassword">Password</label>
-                    <input id="SmtpPassword" is="emby-input" type="password" autocomplete="current-password" />
+            </section>
+            <div class="kindle-actions">
+                <button type="submit" data-field="save" disabled>Save settings</button>
+                <button type="button" data-field="reload">Reload saved settings</button>
+                <p data-field="status" role="status" aria-live="polite"></p>
+            </div>
+        </form>
+        <template data-field="recipientTemplate">
+            <fieldset class="kindle-recipient">
+                <legend>Kindle recipient</legend>
+                <div class="kindle-grid">
+                    <label>Device label <input data-recipient="label" maxlength="80" required></label>
+                    <label>Send-to-Kindle email <input data-recipient="address" type="email" maxlength="254" required autocomplete="off"></label>
                 </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="SenderAddress">Sender address</label>
-                    <input id="SenderAddress" is="emby-input" type="email" autocomplete="email" />
+                <div class="kindle-actions">
+                    <label class="kindle-check"><input data-recipient="enabled" type="checkbox"> Enabled</label>
+                    <button data-recipient="remove" type="button">Remove Kindle</button>
                 </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="KindleAddress">Kindle address</label>
-                    <input id="KindleAddress" is="emby-input" type="email" autocomplete="off" />
-                </div>
-
-                <h2>Conversion</h2>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="KccExecutable">KCC executable</label>
-                    <input id="KccExecutable" is="emby-input" type="text" value="kcc-c2e" required />
-                </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="CalibreExecutable">Calibre executable</label>
-                    <input id="CalibreExecutable" is="emby-input" type="text" value="ebook-convert" required />
-                </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="TemporaryDirectory">Temporary directory</label>
-                    <input id="TemporaryDirectory" is="emby-input" type="text" />
-                </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="AttachmentLimitMegabytes">Attachment limit (MB)</label>
-                    <input id="AttachmentLimitMegabytes" is="emby-input" type="number" min="1" max="50" value="18" required />
-                </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="ConversionTimeoutMinutes">Timeout (minutes)</label>
-                    <input id="ConversionTimeoutMinutes" is="emby-input" type="number" min="1" max="180" value="30" required />
-                </div>
-
-                <h2>KCC</h2>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="KccProfile">Device profile</label>
-                    <input id="KccProfile" is="emby-input" type="text" value="KV" required />
-                </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="KccGamma">Gamma</label>
-                    <input id="KccGamma" is="emby-input" type="number" min="0.01" step="0.01" placeholder="Auto" />
-                </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="KccSplitter">Splitter</label>
-                    <input id="KccSplitter" is="emby-input" type="number" min="0" max="2" value="0" />
-                </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="KccCropping">Cropping</label>
-                    <input id="KccCropping" is="emby-input" type="number" min="0" max="2" value="2" />
-                </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="KccCroppingPower">Cropping power</label>
-                    <input id="KccCroppingPower" is="emby-input" type="number" min="0" max="2" step="0.05" value="1" />
-                </div>
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="KccJpegQuality">JPEG quality</label>
-                    <input id="KccJpegQuality" is="emby-input" type="number" min="0" max="95" value="85" />
-                </div>
-
-                <label class="checkboxContainer"><input id="KccMangaStyle" is="emby-checkbox" type="checkbox" /><span>Manga style</span></label>
-                <label class="checkboxContainer"><input id="KccHighQuality" is="emby-checkbox" type="checkbox" /><span>High quality</span></label>
-                <label class="checkboxContainer"><input id="KccTwoPanel" is="emby-checkbox" type="checkbox" /><span>Two-panel mode</span></label>
-                <label class="checkboxContainer"><input id="KccWebtoon" is="emby-checkbox" type="checkbox" /><span>Webtoon mode</span></label>
-                <label class="checkboxContainer"><input id="KccUpscale" is="emby-checkbox" type="checkbox" /><span>Upscale</span></label>
-                <label class="checkboxContainer"><input id="KccStretch" is="emby-checkbox" type="checkbox" /><span>Stretch</span></label>
-                <label class="checkboxContainer"><input id="KccAutoLevel" is="emby-checkbox" type="checkbox" /><span>Auto level</span></label>
-                <label class="checkboxContainer"><input id="KccDisableAutoContrast" is="emby-checkbox" type="checkbox" /><span>Disable auto contrast</span></label>
-                <label class="checkboxContainer"><input id="KccForceColor" is="emby-checkbox" type="checkbox" /><span>Force color</span></label>
-                <label class="checkboxContainer"><input id="KccSpreadShift" is="emby-checkbox" type="checkbox" /><span>Spread shift</span></label>
-                <label class="checkboxContainer"><input id="KccOnePageLandscape" is="emby-checkbox" type="checkbox" /><span>One page in landscape</span></label>
-
-                <div class="inputContainer">
-                    <label class="inputLabel inputLabelUnfocused" for="KccAdvancedArguments">Advanced arguments</label>
-                    <input id="KccAdvancedArguments" is="emby-input" type="text" autocomplete="off" />
-                </div>
-
-                <div style="display:flex;flex-wrap:wrap;gap:.75em;margin-top:2em">
-                    <button is="emby-button" type="submit" class="raised button-submit block"><span>Save</span></button>
-                    <button id="TestSmtp" is="emby-button" type="button" class="raised block"><span>Test SMTP</span></button>
-                    <button id="TestConverters" is="emby-button" type="button" class="raised block"><span>Test converters</span></button>
-                </div>
-                <div id="DiagnosticResult" role="status" style="margin-top:1em;white-space:pre-wrap"></div>
-            </form>
-        </div>
+            </fieldset>
+        </template>
     </div>
-
-    <script type="text/javascript">
+    <script>
         (() => {
-            const pluginId = '4c4061d6-1c66-4a34-99f9-bbf618c51621';
             const page = document.querySelector('#SendToKindleConfigPage');
-            const form = page.querySelector('#SendToKindleConfigForm');
-            const value = id => page.querySelector('#' + id).value;
-            const checked = id => page.querySelector('#' + id).checked;
-            const setValue = (id, next) => { page.querySelector('#' + id).value = next ?? ''; };
-            const setChecked = (id, next) => { page.querySelector('#' + id).checked = Boolean(next); };
-            const defaults = {
-                SmtpHost: '',
-                SmtpPort: 587,
-                SmtpSecurity: 1,
-                SmtpUsername: '',
-                SmtpPassword: '',
-                SenderAddress: '',
-                KindleAddress: '',
-                KccExecutable: 'kcc-c2e',
-                CalibreExecutable: 'ebook-convert',
-                TemporaryDirectory: '',
-                AttachmentLimitMegabytes: 18,
-                ConversionTimeoutMinutes: 30,
-                Kcc: {
-                    Profile: 'KV',
-                    Gamma: '',
-                    Splitter: 0,
-                    Cropping: 2,
-                    CroppingPower: 1,
-                    JpegQuality: 85,
-                    MangaStyle: false,
-                    HighQuality: false,
-                    TwoPanel: false,
-                    Webtoon: false,
-                    Upscale: false,
-                    Stretch: false,
-                    AutoLevel: false,
-                    DisableAutoContrast: false,
-                    ForceColor: false,
-                    SpreadShift: false,
-                    OnePageLandscape: false,
-                    AdvancedArguments: ''
+            if (!page || page.dataset.bound) return;
+            page.dataset.bound = 'true';
+            const form = page.querySelector('form');
+            const field = name => page.querySelector('[data-field="' + name + '"]');
+            const request = (type, path = '', body) => window.ApiClient.ajax({
+                type,
+                url: window.ApiClient.getUrl('SendToKindle/Admin/Settings' + path),
+                dataType: 'json',
+                ...(body && { contentType: 'application/json', data: JSON.stringify(body) })
+            });
+            let settings;
+            let busy = false;
+            let dirty = false;
+            const rows = new Map();
+            const mib = 1024 * 1024;
+
+            function message(text, error = false) {
+                const status = field('status');
+                status.dataset.error = String(error);
+                status.textContent = text;
+            }
+
+            function refresh() {
+                const smtp = field('mode').value === 'Smtp';
+                field('service').hidden = smtp;
+                field('smtp').hidden = !smtp;
+                field('recipientSection').hidden = !smtp;
+                field('enrichment').hidden = !smtp;
+                if (settings && !settings.smtp.passwordFromEnvironment && settings.smtp.passwordConfigured) {
+                    const sameIdentity = field('host').value.trim().toLowerCase() === settings.smtp.host.toLowerCase()
+                        && Number(field('port').value) === settings.smtp.port
+                        && (field('transport').value === 'Tls' ? 1 : 0) === normalizedTransport(settings.smtp.transport)
+                        && field('username').value.trim() === (settings.smtp.username ?? '');
+                    field('passwordStatus').textContent = sameIdentity ? 'Saved. Leave blank to keep it.'
+                        : field('password').value ? 'The new password will replace the saved password.'
+                        : 'Enter the password for this server. Saving with this field blank removes the old password.';
                 }
-            };
+                field('connection').disabled = busy || dirty || !settings || !smtp;
+                field('save').disabled = busy || !settings || !dirty;
+                field('reload').disabled = busy;
+                field('add').disabled = busy || rows.size >= 100;
+            }
 
-            function readProperty(source, name, fallback) {
-                if (!source) {
-                    return fallback;
+            function changed() {
+                dirty = true;
+                refresh();
+            }
+
+            function displaySecret(input, status, clearRow, clearBox, configured, fromEnvironment) {
+                field(input).value = '';
+                field(input).disabled = fromEnvironment;
+                field(status).textContent = fromEnvironment ? 'Managed by the server environment.'
+                    : configured ? 'Saved. Leave blank to keep it.' : 'No value saved.';
+                field(clearRow).hidden = !configured || fromEnvironment;
+                field(clearBox).checked = false;
+            }
+
+            function appendRecipient(recipient, focus = false) {
+                const fragment = field('recipientTemplate').content.cloneNode(true);
+                const row = fragment.querySelector('fieldset');
+                const control = name => row.querySelector('[data-recipient="' + name + '"]');
+                control('label').value = recipient.label;
+                control('address').value = recipient.address;
+                control('enabled').checked = recipient.enabled;
+                control('remove').addEventListener('click', () => {
+                    rows.delete(row);
+                    row.remove();
+                    field('add').focus();
+                    changed();
+                });
+                rows.set(row, () => ({
+                    id: recipient.id,
+                    label: control('label').value,
+                    address: control('address').value,
+                    enabled: control('enabled').checked,
+                    jellyfinUserId: recipient.jellyfinUserId
+                }));
+                field('recipients').append(fragment);
+                if (focus) control('label').focus();
+            }
+
+            function normalizedTransport(value) {
+                return value === 0 || String(value).toLowerCase() === 'starttls' ? 0 : 1;
+            }
+
+            function display(value) {
+                settings = value;
+                dirty = false;
+                field('mode').value = value.mode === 1 || String(value.mode).toLowerCase() === 'smtp' ? 'Smtp' : 'Service';
+                for (const name of ['host', 'port', 'sender', 'username']) field(name).value = value.smtp[name] ?? '';
+                field('transport').value = normalizedTransport(value.smtp.transport) === 0 ? 'StartTls' : 'Tls';
+                field('limit').value = value.smtp.maxAttachmentBytes / mib;
+                field('googleEnabled').checked = value.googleBooksEnabled;
+                displaySecret('password', 'passwordStatus', 'passwordClearRow', 'passwordClear', value.smtp.passwordConfigured, value.smtp.passwordFromEnvironment);
+                displaySecret('googleKey', 'googleStatus', 'googleClearRow', 'googleClear', value.googleBooksKeyConfigured, value.googleBooksKeyFromEnvironment);
+                rows.clear();
+                field('recipients').replaceChildren();
+                value.recipients.forEach(recipient => appendRecipient(recipient));
+                refresh();
+            }
+
+            async function run(action) {
+                if (busy) return;
+                busy = true;
+                for (const control of form.elements) {
+                    control.dataset.wasDisabled = String(control.disabled);
+                    control.disabled = true;
                 }
-
-                const camelName = name.charAt(0).toLowerCase() + name.slice(1);
-                return source[name] ?? source[camelName] ?? fallback;
-            }
-
-            function readNumber(source, name, fallback, minimum, maximum) {
-                const next = Number(readProperty(source, name, fallback));
-                return Number.isFinite(next) && next >= minimum && next <= maximum ? next : fallback;
-            }
-
-            function readGamma(source) {
-                const gamma = String(readProperty(source, 'Gamma', defaults.Kcc.Gamma)).trim();
-                return gamma.toLowerCase() === 'auto' ? '' : gamma;
-            }
-
-            function showResult(lines) {
-                page.querySelector('#DiagnosticResult').textContent = Array.isArray(lines) ? lines.join('\n') : lines;
-            }
-
-            function formatDiagnostic(result) {
-                const name = result.Name ?? result.name ?? 'Check';
-                const success = result.Success ?? result.success ?? false;
-                const message = result.Message ?? result.message ?? '';
-                return name + ': ' + (success ? 'OK' : 'FAILED') + ' - ' + message;
-            }
-
-            async function loadConfiguration() {
-                Dashboard.showLoadingMsg();
                 try {
-                    const config = await ApiClient.getPluginConfiguration(pluginId);
-                    setValue('SmtpHost', readProperty(config, 'SmtpHost', defaults.SmtpHost));
-                    setValue('SmtpPort', readNumber(config, 'SmtpPort', defaults.SmtpPort, 1, 65535));
-                    setValue('SmtpSecurity', readNumber(config, 'SmtpSecurity', defaults.SmtpSecurity, 0, 3));
-                    setValue('SmtpUsername', readProperty(config, 'SmtpUsername', defaults.SmtpUsername));
-                    setValue('SmtpPassword', readProperty(config, 'SmtpPassword', defaults.SmtpPassword));
-                    setValue('SenderAddress', readProperty(config, 'SenderAddress', defaults.SenderAddress));
-                    setValue('KindleAddress', readProperty(config, 'KindleAddress', defaults.KindleAddress));
-                    setValue('KccExecutable', readProperty(config, 'KccExecutable', defaults.KccExecutable));
-                    setValue('CalibreExecutable', readProperty(config, 'CalibreExecutable', defaults.CalibreExecutable));
-                    setValue('TemporaryDirectory', readProperty(config, 'TemporaryDirectory', defaults.TemporaryDirectory));
-                    setValue(
-                        'AttachmentLimitMegabytes',
-                        readNumber(config, 'AttachmentLimitMegabytes', defaults.AttachmentLimitMegabytes, 1, 50));
-                    setValue(
-                        'ConversionTimeoutMinutes',
-                        readNumber(config, 'ConversionTimeoutMinutes', defaults.ConversionTimeoutMinutes, 1, 180));
-
-                    const kcc = readProperty(config, 'Kcc', defaults.Kcc);
-                    setValue('KccProfile', readProperty(kcc, 'Profile', defaults.Kcc.Profile));
-                    setValue('KccGamma', readGamma(kcc));
-                    setValue('KccSplitter', readNumber(kcc, 'Splitter', defaults.Kcc.Splitter, 0, 2));
-                    setValue('KccCropping', readNumber(kcc, 'Cropping', defaults.Kcc.Cropping, 0, 2));
-                    setValue(
-                        'KccCroppingPower',
-                        readNumber(kcc, 'CroppingPower', defaults.Kcc.CroppingPower, 0, 2));
-                    setValue('KccJpegQuality', readNumber(kcc, 'JpegQuality', defaults.Kcc.JpegQuality, 0, 95));
-                    setChecked('KccMangaStyle', readProperty(kcc, 'MangaStyle', defaults.Kcc.MangaStyle));
-                    setChecked('KccHighQuality', readProperty(kcc, 'HighQuality', defaults.Kcc.HighQuality));
-                    setChecked('KccTwoPanel', readProperty(kcc, 'TwoPanel', defaults.Kcc.TwoPanel));
-                    setChecked('KccWebtoon', readProperty(kcc, 'Webtoon', defaults.Kcc.Webtoon));
-                    setChecked('KccUpscale', readProperty(kcc, 'Upscale', defaults.Kcc.Upscale));
-                    setChecked('KccStretch', readProperty(kcc, 'Stretch', defaults.Kcc.Stretch));
-                    setChecked('KccAutoLevel', readProperty(kcc, 'AutoLevel', defaults.Kcc.AutoLevel));
-                    setChecked(
-                        'KccDisableAutoContrast',
-                        readProperty(kcc, 'DisableAutoContrast', defaults.Kcc.DisableAutoContrast));
-                    setChecked('KccForceColor', readProperty(kcc, 'ForceColor', defaults.Kcc.ForceColor));
-                    setChecked('KccSpreadShift', readProperty(kcc, 'SpreadShift', defaults.Kcc.SpreadShift));
-                    setChecked(
-                        'KccOnePageLandscape',
-                        readProperty(kcc, 'OnePageLandscape', defaults.Kcc.OnePageLandscape));
-                    setValue(
-                        'KccAdvancedArguments',
-                        readProperty(kcc, 'AdvancedArguments', defaults.Kcc.AdvancedArguments));
+                    await action();
                 } finally {
-                    Dashboard.hideLoadingMsg();
+                    for (const control of form.elements) {
+                        if (control.dataset.wasDisabled === undefined) continue;
+                        control.disabled = control.dataset.wasDisabled === 'true';
+                        delete control.dataset.wasDisabled;
+                    }
+                    if (settings) {
+                        field('password').disabled = settings.smtp.passwordFromEnvironment;
+                        field('googleKey').disabled = settings.googleBooksKeyFromEnvironment;
+                    }
+                    busy = false;
+                    refresh();
                 }
             }
 
-            page.addEventListener('pageshow', loadConfiguration);
-            form.addEventListener('submit', async event => {
+            async function load() {
+                await run(async () => {
+                    message('Loading settings…');
+                    try {
+                        display(await request('GET'));
+                        message('');
+                    } catch {
+                        message('Settings could not be loaded. Reload to try again.', true);
+                    }
+                });
+            }
+
+            field('purelymail').addEventListener('click', () => {
+                field('host').value = 'smtp.purelymail.com';
+                field('port').value = 465;
+                field('transport').value = 'Tls';
+                field('username').focus();
+                changed();
+            });
+            field('add').addEventListener('click', () => {
+                appendRecipient({ id: '', label: '', address: '', enabled: true, jellyfinUserId: null }, true);
+                changed();
+            });
+            field('reload').addEventListener('click', () => {
+                if (!dirty || window.confirm('Discard unsaved changes?')) load();
+            });
+            field('connection').addEventListener('click', () => run(async () => {
+                message('Checking the saved SMTP connection…');
+                try {
+                    await request('POST', '/SmtpConnection');
+                    message('SMTP connection succeeded. No email was sent.');
+                } catch {
+                    message('Could not connect. Check the saved host, security, username and password.', true);
+                }
+            }));
+            form.addEventListener('input', changed);
+            form.addEventListener('submit', event => {
                 event.preventDefault();
-                Dashboard.showLoadingMsg();
-                try {
-                    const config = await ApiClient.getPluginConfiguration(pluginId);
-                    Object.assign(config, {
-                        SmtpHost: value('SmtpHost').trim(),
-                        SmtpPort: Number(value('SmtpPort')),
-                        SmtpSecurity: Number(value('SmtpSecurity')),
-                        SmtpUsername: value('SmtpUsername'),
-                        SmtpPassword: value('SmtpPassword'),
-                        SenderAddress: value('SenderAddress').trim(),
-                        KindleAddress: value('KindleAddress').trim(),
-                        KccExecutable: value('KccExecutable').trim(),
-                        CalibreExecutable: value('CalibreExecutable').trim(),
-                        TemporaryDirectory: value('TemporaryDirectory').trim(),
-                        AttachmentLimitMegabytes: Number(value('AttachmentLimitMegabytes')),
-                        ConversionTimeoutMinutes: Number(value('ConversionTimeoutMinutes')),
-                        Kcc: {
-                            Profile: value('KccProfile').trim(),
-                            Gamma: value('KccGamma').trim(),
-                            Splitter: Number(value('KccSplitter')),
-                            Cropping: Number(value('KccCropping')),
-                            CroppingPower: Number(value('KccCroppingPower')),
-                            JpegQuality: Number(value('KccJpegQuality')),
-                            MangaStyle: checked('KccMangaStyle'),
-                            HighQuality: checked('KccHighQuality'),
-                            TwoPanel: checked('KccTwoPanel'),
-                            Webtoon: checked('KccWebtoon'),
-                            Upscale: checked('KccUpscale'),
-                            Stretch: checked('KccStretch'),
-                            AutoLevel: checked('KccAutoLevel'),
-                            DisableAutoContrast: checked('KccDisableAutoContrast'),
-                            ForceColor: checked('KccForceColor'),
-                            SpreadShift: checked('KccSpreadShift'),
-                            OnePageLandscape: checked('KccOnePageLandscape'),
-                            AdvancedArguments: value('KccAdvancedArguments').trim()
-                        }
-                    });
-                    const result = await ApiClient.updatePluginConfiguration(pluginId, config);
-                    Dashboard.processPluginConfigurationUpdateResult(result);
-                } finally {
-                    Dashboard.hideLoadingMsg();
+                if (!settings || !dirty) return;
+                const smtp = field('mode').value === 'Smtp';
+                const host = field('host').value.trim();
+                const sender = field('sender').value.trim();
+                if (smtp && (!host || !sender || !form.reportValidity())) {
+                    message('Check the SMTP fields and each Kindle label and email.', true);
+                    if (!host) field('host').focus();
+                    else if (!sender) field('sender').focus();
+                    return;
                 }
-            });
 
-            page.querySelector('#TestSmtp').addEventListener('click', async () => {
-                Dashboard.showLoadingMsg();
-                try {
-                    const result = await ApiClient.ajax({
-                        type: 'POST',
-                        url: ApiClient.getUrl('SendToKindle/Diagnostics/Smtp'),
-                        dataType: 'json'
-                    });
-                    showResult(formatDiagnostic(result));
-                } finally {
-                    Dashboard.hideLoadingMsg();
-                }
+                const payload = {
+                    settings: {
+                        revision: settings.revision,
+                        mode: smtp ? 1 : 0,
+                        smtp: {
+                            host,
+                            port: Number(field('port').value),
+                            transport: field('transport').value === 'Tls' ? 1 : 0,
+                            sender,
+                            username: field('username').value.trim(),
+                            password: field('password').value || null,
+                            maxAttachmentBytes: Number(field('limit').value) * mib
+                        },
+                        recipients: Array.from(rows.values(), read => read()),
+                        googleBooksEnabled: field('googleEnabled').checked,
+                        googleBooksApiKey: field('googleKey').value || null
+                    },
+                    clearSmtpPassword: field('passwordClear').checked,
+                    clearGoogleBooksKey: field('googleClear').checked
+                };
+                run(async () => {
+                    message('Saving settings…');
+                    try {
+                        display(await request('PUT', '', payload));
+                        message('Settings saved.');
+                    } catch (error) {
+                        message(error?.status === 409
+                            ? 'Another session changed the settings. Reload before saving again.'
+                            : 'Settings could not be saved. Check the fields and try again.', true);
+                    }
+                });
             });
-
-            page.querySelector('#TestConverters').addEventListener('click', async () => {
-                Dashboard.showLoadingMsg();
-                try {
-                    const results = await ApiClient.ajax({
-                        type: 'POST',
-                        url: ApiClient.getUrl('SendToKindle/Diagnostics/Converters'),
-                        dataType: 'json'
-                    });
-                    showResult(results.map(formatDiagnostic));
-                } finally {
-                    Dashboard.hideLoadingMsg();
-                }
+            page.addEventListener('pageshow', () => {
+                if (!settings) load();
             });
         })();
     </script>

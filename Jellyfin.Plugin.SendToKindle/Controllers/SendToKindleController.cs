@@ -1,11 +1,10 @@
-using System.Reflection;
-using Jellyfin.Plugin.SendToKindle.Conversion;
-using Jellyfin.Plugin.SendToKindle.Diagnostics;
-using Jellyfin.Plugin.SendToKindle.Email;
-using Jellyfin.Plugin.SendToKindle.Jobs;
+using System.Text.Json.Serialization;
+using Jellyfin.Data;
+using Jellyfin.Database.Implementations.Entities;
+using Jellyfin.Database.Implementations.Enums;
+using Jellyfin.Plugin.SendToKindle.Delivery;
 using Jellyfin.Plugin.SendToKindle.WebIntegration;
 using MediaBrowser.Common.Api;
-using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,126 +15,156 @@ namespace Jellyfin.Plugin.SendToKindle.Controllers;
 [ApiController]
 [Route("SendToKindle")]
 [Authorize(Policy = Policies.RequiresElevation)]
+[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 public sealed class SendToKindleController : ControllerBase
 {
     private readonly ILibraryManager _libraryManager;
-    private readonly ISendJobQueue _jobQueue;
-    private readonly IConverterDiagnosticService _converterDiagnosticService;
-    private readonly ISmtpDeliveryService _smtpDeliveryService;
+    private readonly IUserManager _userManager;
+    private readonly IDeliveryClient _deliveryClient;
     private readonly IWebIntegrationStatus _webIntegrationStatus;
 
     public SendToKindleController(
         ILibraryManager libraryManager,
-        ISendJobQueue jobQueue,
-        IConverterDiagnosticService converterDiagnosticService,
-        ISmtpDeliveryService smtpDeliveryService,
+        IUserManager userManager,
+        IDeliveryClient deliveryClient,
         IWebIntegrationStatus webIntegrationStatus)
     {
         _libraryManager = libraryManager;
-        _jobQueue = jobQueue;
-        _converterDiagnosticService = converterDiagnosticService;
-        _smtpDeliveryService = smtpDeliveryService;
+        _userManager = userManager;
+        _deliveryClient = deliveryClient;
         _webIntegrationStatus = webIntegrationStatus;
     }
 
-    [HttpPost("Jobs")]
-    [ProducesResponseType(typeof(SendJobSnapshot), StatusCodes.Status202Accepted)]
-    [ProducesResponseType(typeof(SendJobSnapshot), StatusCodes.Status409Conflict)]
-    public ActionResult<SendJobSnapshot> Enqueue([FromBody] EnqueueSendRequest request)
+    [HttpGet("Books/{bookId}/Options")]
+    public async Task<IActionResult> GetOptions(string bookId, CancellationToken cancellationToken)
     {
-        BaseItem item = _libraryManager.GetItemById(request.ItemId)
-            ?? throw new KeyNotFoundException($"Jellyfin item '{request.ItemId}' was not found.");
-        if (item is not Book)
+        if (GetCurrentUser() is not { } user)
         {
-            return BadRequest("Send to Kindle is available only for Books library items.");
+            return Error(StatusCodes.Status401Unauthorized, "unauthorized");
         }
 
-        if (string.IsNullOrWhiteSpace(item.Path) || !BookConversionService.IsSupportedExtension(item.Path))
+        if (!TryParseBookId(bookId, out Guid itemId))
         {
-            return BadRequest("The selected book does not have a supported EPUB, PDF, MOBI, AZW, AZW3, CBR, or CBZ file.");
+            return Error(StatusCodes.Status400BadRequest, "invalid_request");
         }
 
-        BookSource source = new(item.Id, item.Path, item.Name, ReadAuthor(item));
+        if (!CanSendBook(user, itemId))
+        {
+            return Error(StatusCodes.Status404NotFound, "unavailable");
+        }
+
         try
         {
-            SendJobSnapshot job = _jobQueue.Enqueue(source);
-            return AcceptedAtAction(nameof(GetJob), new { jobId = job.JobId }, job);
+            return Ok(await _deliveryClient.GetOptionsAsync(user.Id, itemId, cancellationToken).ConfigureAwait(false));
         }
-        catch (DuplicateJobException exception)
+        catch (DeliveryException exception)
         {
-            return Conflict(exception.ExistingJob);
+            return Error(exception.StatusCode, exception.Error);
         }
     }
 
-    [HttpGet("Jobs/{jobId:guid}")]
-    [ProducesResponseType(typeof(SendJobSnapshot), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<SendJobSnapshot> GetJob(Guid jobId)
+    [HttpPost("Jobs")]
+    public async Task<IActionResult> Enqueue([FromBody] EnqueueSendRequest request, CancellationToken cancellationToken)
     {
-        SendJobSnapshot? job = _jobQueue.Get(jobId);
-        return job is null ? NotFound() : Ok(job);
+        if (GetCurrentUser() is not { } user)
+        {
+            return Error(StatusCodes.Status401Unauthorized, "unauthorized");
+        }
+
+        if (!TryParseBookId(request.BookId, out Guid itemId)
+            || !TryParseCanonicalUuid(request.IdempotencyKey, out Guid key) || request.IdempotencyKey[14] != '4'
+            || request.IdempotencyKey[19] is not ('8' or '9' or 'a' or 'b')
+            || string.IsNullOrWhiteSpace(request.DeviceId) || string.IsNullOrWhiteSpace(request.Format))
+        {
+            return Error(StatusCodes.Status400BadRequest, "invalid_request");
+        }
+
+        if (!CanSendBook(user, itemId))
+        {
+            return Error(StatusCodes.Status404NotFound, "unavailable");
+        }
+
+        try
+        {
+            DeliverySubmission submission = await _deliveryClient
+                .SubmitAsync(user.Id, itemId, request.DeviceId, request.Format, key, cancellationToken)
+                .ConfigureAwait(false);
+            return submission.IsReplay
+                ? Ok(submission.Receipt)
+                : AcceptedAtAction(nameof(GetJob), new { jobId = submission.Receipt.JobId }, submission.Receipt);
+        }
+        catch (DeliveryException exception)
+        {
+            return Error(exception.StatusCode, exception.Error);
+        }
     }
 
-    [HttpGet("Jobs")]
-    public ActionResult<IReadOnlyList<SendJobSnapshot>> GetRecentJobs([FromQuery] int limit = 20)
+    [HttpGet("Jobs/{jobId}")]
+    public async Task<IActionResult> GetJob(string jobId, CancellationToken cancellationToken)
     {
-        return Ok(_jobQueue.GetRecent(limit));
+        if (GetCurrentUser() is not { } user)
+        {
+            return Error(StatusCodes.Status401Unauthorized, "unauthorized");
+        }
+
+        if (!TryParseCanonicalUuid(jobId, out Guid deliveryJobId))
+        {
+            return Error(StatusCodes.Status400BadRequest, "invalid_request");
+        }
+
+        if (!user.HasPermission(PermissionKind.EnableContentDownloading))
+        {
+            return Error(StatusCodes.Status404NotFound, "unavailable");
+        }
+
+        try
+        {
+            // Only the delivery service knows the job's book and owner. It rechecks both.
+            return Ok(await _deliveryClient.GetStatusAsync(user.Id, deliveryJobId, cancellationToken).ConfigureAwait(false));
+        }
+        catch (DeliveryException exception)
+        {
+            return Error(exception.StatusCode, exception.Error);
+        }
     }
 
     [HttpGet("Diagnostics")]
     public ActionResult<PluginDiagnosticsResponse> GetDiagnostics()
     {
-        return Ok(new PluginDiagnosticsResponse(
-            _webIntegrationStatus.IsRegistered,
-            _webIntegrationStatus.Message,
-            !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(SmtpDeliveryService.PasswordEnvironmentVariable))));
+        return Ok(new PluginDiagnosticsResponse(_webIntegrationStatus.IsRegistered, _webIntegrationStatus.Message));
     }
 
-    [HttpPost("Diagnostics/Smtp")]
-    public async Task<ActionResult<DependencyCheckResult>> CheckSmtp(CancellationToken cancellationToken)
+    private User? GetCurrentUser()
     {
-        try
+        // Jellyfin's authentication handler supplies these claims from the authenticated session.
+        if (User.Identity?.IsAuthenticated != true
+            || bool.TryParse(User.FindFirst("Jellyfin-IsApiKey")?.Value, out bool isApiKey) && isApiKey
+            || !Guid.TryParseExact(User.FindFirst("Jellyfin-UserId")?.Value, "N", out Guid userId)
+            || userId == Guid.Empty)
         {
-            await _smtpDeliveryService.CheckConnectionAsync(cancellationToken).ConfigureAwait(false);
-            return Ok(new DependencyCheckResult("SMTP", true, "Connection and authentication succeeded."));
-        }
-        catch (Exception exception)
-        {
-            return Ok(new DependencyCheckResult("SMTP", false, exception.GetBaseException().Message));
-        }
-    }
-
-    [HttpPost("Diagnostics/Converters")]
-    public async Task<ActionResult<IReadOnlyList<DependencyCheckResult>>> CheckConverters(
-        CancellationToken cancellationToken)
-    {
-        IReadOnlyList<DependencyCheckResult> results = await _converterDiagnosticService
-            .CheckAsync(cancellationToken)
-            .ConfigureAwait(false);
-        return Ok(results);
-    }
-
-    private static string ReadAuthor(BaseItem item)
-    {
-        foreach (string propertyName in new[] { "Author", "Authors" })
-        {
-            PropertyInfo? property = item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
-            object? value = property?.GetValue(item);
-            if (value is string author && !string.IsNullOrWhiteSpace(author))
-            {
-                return author;
-            }
-
-            if (value is IEnumerable<string> authors)
-            {
-                string joined = string.Join(", ", authors.Where(author => !string.IsNullOrWhiteSpace(author)));
-                if (!string.IsNullOrWhiteSpace(joined))
-                {
-                    return joined;
-                }
-            }
+            return null;
         }
 
-        return "Unknown author";
+        User? user = _userManager.GetUserById(userId);
+        return user is not null && !user.HasPermission(PermissionKind.IsDisabled) ? user : null;
     }
+
+    private bool CanSendBook(User user, Guid itemId) => DeliveryBookAccess.Find(_libraryManager, user, itemId) is not null;
+
+    private static bool TryParseBookId(string? value, out Guid id)
+    {
+        return Guid.TryParseExact(value, "N", out id) && id != Guid.Empty && value?.Length == 32;
+    }
+
+    private static bool TryParseCanonicalUuid(string? value, out Guid id)
+    {
+        return Guid.TryParseExact(value, "D", out id) && id != Guid.Empty && value == id.ToString("D");
+    }
+
+    private ObjectResult Error(int statusCode, string error)
+    {
+        return StatusCode(statusCode, new DeliveryError(error));
+    }
+
+    private sealed record DeliveryError([property: JsonPropertyName("error")] string Error);
 }

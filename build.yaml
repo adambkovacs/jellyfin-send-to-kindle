@@ -1,18 +1,17 @@
 {
-  "name": "Send to Kindle",
-  "guid": "4c4061d6-1c66-4a34-99f9-bbf618c51621",
-  "version": "1.0.0.5",
-  "targetAbi": "10.11.0.0",
-  "framework": "net9.0",
-  "overview": "Convert books and send them to Kindle from Jellyfin",
-  "description": "Adds an administrator-only Send to Kindle action to supported books. Comics are converted with KCC and other ebook formats are normalized with Calibre before SMTP delivery.",
+  "name": "Books to Kindle",
+  "guid": "5b1ea50d-4836-478b-95d4-1e60d4016b0a",
+  "version": "2.0.0.0",
+  "targetAbi": "12.4.0.0",
+  "framework": "net10.0",
+  "overview": "Send books from Jellyfin Web to your Kindle",
+  "description": "Select a device from a Book page and send through your SMTP account or a compatible remote delivery service.",
   "category": "General",
-  "owner": "vitorpy",
+  "owner": "adambkovacs",
   "artifacts": [
     "Jellyfin.Plugin.SendToKindle.dll",
     "MailKit.dll",
-    "MimeKit.dll",
-    "BouncyCastle.Cryptography.dll"
+    "MimeKit.Core.dll"
   ],
-  "changelog": "Omit KCC gamma for automatic mode and validate numeric overrides"
+  "changelog": "Adds standalone SMTP, device management and optional metadata enrichment. Install under the new plugin ID after removing the earlier variant."
 }

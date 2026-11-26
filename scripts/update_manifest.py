@@ -18,27 +18,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    plugin = {
-        "guid": "4c4061d6-1c66-4a34-99f9-bbf618c51621",
-        "name": "Send to Kindle",
-        "overview": "Convert books and send them to Kindle from Jellyfin",
-        "description": (
-            "Adds an administrator-only Send to Kindle action to supported books. "
-            "Comics use KCC and other ebook formats use Calibre before SMTP delivery."
-        ),
-        "owner": "vitorpy",
-        "category": "General",
-        "versions": [],
-    }
-
-    if args.path.exists():
-        document = json.loads(args.path.read_text(encoding="utf-8"))
-        if not isinstance(document, list) or len(document) != 1:
-            raise ValueError("Existing manifest must contain exactly one plugin entry.")
-        existing = document[0]
-        if existing.get("guid") != plugin["guid"]:
-            raise ValueError("Existing manifest GUID does not match this plugin.")
-        plugin["versions"] = existing.get("versions", [])
+    metadata_file = Path(__file__).resolve().parent.parent / "build.yaml"
+    metadata = json.loads(metadata_file.read_text(encoding="utf-8"))
+    plugin = {key: metadata[key] for key in ("guid", "name", "overview", "description", "owner", "category")}
+    previous = json.loads(args.path.read_text(encoding="utf-8")) if args.path.exists() else []
+    plugin["versions"] = next((item["versions"] for item in previous if item["guid"] == plugin["guid"]), [])
 
     plugin["versions"] = [
         version for version in plugin["versions"] if version.get("version") != args.version

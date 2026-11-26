@@ -1,0 +1,116 @@
+[
+  {
+    "name": "options",
+    "method": "GET",
+    "path": "/v1/books/11111111111111111111111111111111/options",
+    "status": 200,
+    "response": {
+      "devices": [
+        {
+          "id": "paperwhite",
+          "label": "Reading room"
+        },
+        {
+          "id": "oasis",
+          "label": "Travel reader"
+        }
+      ],
+      "formats": [
+        "original"
+      ]
+    }
+  },
+  {
+    "name": "enqueue",
+    "method": "POST",
+    "path": "/v1/jobs",
+    "body": {
+      "bookId": "11111111111111111111111111111111",
+      "deviceId": "paperwhite",
+      "format": "original",
+      "idempotencyKey": "022d3cee-5833-4aa0-a49f-f9e9acf8954b"
+    },
+    "status": 202,
+    "response": {
+      "jobId": "cfd75da4-20eb-4ec1-a267-38a4e4f71e87",
+      "status": "queued"
+    }
+  },
+  {
+    "name": "replay",
+    "method": "POST",
+    "path": "/v1/jobs",
+    "body": {
+      "bookId": "11111111111111111111111111111111",
+      "deviceId": "paperwhite",
+      "format": "original",
+      "idempotencyKey": "022d3cee-5833-4aa0-a49f-f9e9acf8954b"
+    },
+    "status": 200,
+    "response": {
+      "jobId": "cfd75da4-20eb-4ec1-a267-38a4e4f71e87",
+      "status": "queued"
+    }
+  },
+  {
+    "name": "conflicting device",
+    "method": "POST",
+    "path": "/v1/jobs",
+    "body": {
+      "bookId": "11111111111111111111111111111111",
+      "deviceId": "oasis",
+      "format": "original",
+      "idempotencyKey": "022d3cee-5833-4aa0-a49f-f9e9acf8954b"
+    },
+    "status": 409,
+    "response": {
+      "error": "key_conflict"
+    }
+  },
+  {
+    "name": "arbitrary path",
+    "method": "POST",
+    "path": "/v1/jobs",
+    "body": {
+      "bookId": "11111111111111111111111111111111",
+      "deviceId": "paperwhite",
+      "format": "original",
+      "idempotencyKey": "022d3cee-5833-4aa0-a49f-f9e9acf8954b",
+      "path": "/test/book.pdf"
+    },
+    "status": 400,
+    "response": {
+      "error": "invalid_request"
+    }
+  },
+  {
+    "name": "unknown device",
+    "method": "POST",
+    "path": "/v1/jobs",
+    "body": {
+      "bookId": "11111111111111111111111111111111",
+      "deviceId": "other",
+      "format": "original",
+      "idempotencyKey": "022d3cee-5833-4aa0-a49f-f9e9acf8954b"
+    },
+    "status": 422,
+    "response": {
+      "error": "unknown_device"
+    }
+  },
+  {
+    "name": "inaccessible book",
+    "method": "POST",
+    "path": "/v1/jobs",
+    "body": {
+      "bookId": "22222222222222222222222222222222",
+      "deviceId": "paperwhite",
+      "format": "original",
+      "idempotencyKey": "022d3cee-5833-4aa0-a49f-f9e9acf8954b"
+    },
+    "status": 404,
+    "response": {
+      "error": "unavailable"
+    }
+  }
+]

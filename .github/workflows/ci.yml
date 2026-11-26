@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - books/12.4
   pull_request:
   workflow_dispatch:
 
@@ -18,7 +18,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: 10.0.x
 
       - name: Restore
         run: dotnet restore Jellyfin.Plugin.SendToKindle.slnx
@@ -36,6 +36,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts/package
+          cp COPYING LICENSE third-party/*-LICENSE.txt artifacts/package/
           while IFS= read -r artifact; do
             test -f "artifacts/publish/${artifact}"
             cp "artifacts/publish/${artifact}" artifacts/package/

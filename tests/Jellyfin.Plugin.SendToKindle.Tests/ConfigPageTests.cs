@@ -12,34 +12,15 @@ public sealed class ConfigPageTests
         Assert.DoesNotContain("${", contents, StringComparison.Ordinal);
     }
 
-    [Theory]
-    [InlineData("id=\"SmtpPort\"", "value=\"587\"")]
-    [InlineData("id=\"KccExecutable\"", "value=\"kcc-c2e\"")]
-    [InlineData("id=\"CalibreExecutable\"", "value=\"ebook-convert\"")]
-    [InlineData("id=\"AttachmentLimitMegabytes\"", "value=\"18\"")]
-    [InlineData("id=\"ConversionTimeoutMinutes\"", "value=\"30\"")]
-    [InlineData("id=\"KccProfile\"", "value=\"KV\"")]
-    [InlineData("id=\"KccGamma\"", "placeholder=\"Auto\"")]
-    [InlineData("id=\"KccCropping\"", "value=\"2\"")]
-    [InlineData("id=\"KccCroppingPower\"", "value=\"1\"")]
-    [InlineData("id=\"KccJpegQuality\"", "value=\"85\"")]
-    public void ConfigPage_ProvidesInitialFieldDefault(string fieldMarker, string defaultMarker)
-    {
-        string contents = ReadConfigPage();
-        int fieldStart = contents.IndexOf(fieldMarker, StringComparison.Ordinal);
-
-        Assert.True(fieldStart >= 0, $"Field marker '{fieldMarker}' was not found.");
-        int fieldEnd = contents.IndexOf("/>", fieldStart, StringComparison.Ordinal);
-        Assert.True(fieldEnd > fieldStart, $"Field '{fieldMarker}' did not end with '/>'.");
-        Assert.Contains(defaultMarker, contents[fieldStart..fieldEnd], StringComparison.Ordinal);
-    }
-
     [Fact]
-    public void ConfigPage_SelectsStartTlsByDefault()
+    public void ConfigPage_UsesWriteOnlyFieldsAndTheDedicatedAdminApi()
     {
         string contents = ReadConfigPage();
-
-        Assert.Contains("<option value=\"1\" selected>STARTTLS</option>", contents, StringComparison.Ordinal);
+        Assert.Contains("SendToKindle/Admin/Settings", contents, StringComparison.Ordinal);
+        Assert.Contains("data-field=\"password\" type=\"password\"", contents, StringComparison.Ordinal);
+        Assert.Contains("data-field=\"googleKey\" type=\"password\"", contents, StringComparison.Ordinal);
+        Assert.DoesNotContain("getPluginConfiguration", contents, StringComparison.Ordinal);
+        Assert.DoesNotContain("updatePluginConfiguration", contents, StringComparison.Ordinal);
     }
 
     private static string ReadConfigPage()

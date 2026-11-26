@@ -9,17 +9,14 @@ namespace Jellyfin.Plugin.SendToKindle;
 
 public sealed class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 {
-    public static readonly Guid PluginId = Guid.Parse("4c4061d6-1c66-4a34-99f9-bbf618c51621");
+    public static readonly Guid PluginId = Guid.Parse("5b1ea50d-4836-478b-95d4-1e60d4016b0a");
 
     public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer)
         : base(applicationPaths, xmlSerializer)
     {
-        Instance = this;
     }
 
-    public static Plugin? Instance { get; private set; }
-
-    public override string Name => "Send to Kindle";
+    public override string Name => "Books to Kindle";
 
     public override Guid Id => PluginId;
 
