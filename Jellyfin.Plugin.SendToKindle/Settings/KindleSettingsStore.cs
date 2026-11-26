@@ -89,6 +89,8 @@ public sealed class KindleSettingsStore : IKindleSettingsStore
                 },
                 Recipients = recipients,
                 GoogleBooksEnabled = requested.GoogleBooksEnabled,
+                // Older dashboards omit the work lookup permission.
+                GoogleBooksWorkLookupEnabled = requested.GoogleBooksWorkLookupEnabled ?? saved.GoogleBooksWorkLookupEnabled ?? false,
                 GoogleBooksApiKey = clearGoogleKey ? null : requested.GoogleBooksApiKey ?? saved.GoogleBooksApiKey,
             };
             WriteSaved(updated);
@@ -142,6 +144,7 @@ public sealed class KindleSettingsStore : IKindleSettingsStore
             },
             Recipients = settings.Recipients,
             GoogleBooksEnabled = settings.GoogleBooksEnabled,
+            GoogleBooksWorkLookupEnabled = settings.GoogleBooksWorkLookupEnabled ?? false,
             GoogleBooksApiKey = googleKey,
         };
     }

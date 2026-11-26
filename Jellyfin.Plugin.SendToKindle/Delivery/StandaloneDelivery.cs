@@ -63,7 +63,8 @@ internal sealed class StandaloneDelivery(
             }
 
             await using Stream? enriched = contentType == "application/epub+zip" && settings.GoogleBooksEnabled
-                ? await enricher.TryCreateEnrichedAttachmentAsync(original, path, true, settings.GoogleBooksApiKey, stoppingToken)
+                ? await enricher.TryCreateEnrichedAttachmentAsync(original, path, true, settings.GoogleBooksApiKey,
+                    stoppingToken, workLookupEnabled: settings.GoogleBooksWorkLookupEnabled == true)
                     .ConfigureAwait(false)
                 : null;
             Stream attachment = enriched is not null && enriched.Length > 0 && enriched.Length <= settings.Smtp.MaxAttachmentBytes

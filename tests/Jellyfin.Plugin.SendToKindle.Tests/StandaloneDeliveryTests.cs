@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Xml.Linq;
 using Jellyfin.Data;
 using Jellyfin.Database.Implementations.Entities;
 using Jellyfin.Database.Implementations.Enums;
@@ -123,6 +124,78 @@ public sealed class StandaloneDeliveryTests
         }
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task DeliverySendsTheOriginalOrEnrichedEpubAccordingToWorkLookupConsent(bool workLookupEnabled)
+    {
+        var cancellation = TestContext.Current.CancellationToken;
+        using var fixture = new BookEnricherTests.EpubFixture("urn:uuid:delivery-fixture");
+        byte[] original = await File.ReadAllBytesAsync(fixture.Path, cancellation);
+        var user = new User("test-user", "test-auth", "test-reset");
+        user.SetPermission(PermissionKind.EnableContentDownloading, true);
+        ILibraryManager library = Proxy<ILibraryManager>((_, _) => new DownloadableBook { Path = fixture.Path });
+        IUserManager users = Proxy<IUserManager>((_, _) => user);
+        DirectoryInfo directory = Directory.CreateTempSubdirectory("kindle-delivery-enrichment-");
+        try
+        {
+            var settings = new KindleSettingsStore(directory.FullName, _ => null);
+            Assert.Null(settings.Save(new KindleSettings
+            {
+                Mode = DeliveryMode.Smtp,
+                Smtp = new SmtpSettings { Host = "smtp.example.invalid", Sender = "sender@example.invalid" },
+                GoogleBooksEnabled = true,
+                GoogleBooksWorkLookupEnabled = workLookupEnabled,
+                GoogleBooksApiKey = BookEnricherTests.ApiKey,
+                Recipients = [new RecipientSettings
+                {
+                    Label = "Reader", Address = "reader@example.invalid", AllowedUserIds = [user.Id],
+                }],
+            }, false, false));
+            var catalog = BookEnricherTests.CatalogPage(BookEnricherTests.CatalogVolume());
+            using var http = new BookEnricherTests.WorkCatalogHandler(_ => catalog);
+            using var client = new HttpClient(http);
+            using var journal = new DeliveryJournal(Path.Combine(directory.FullName, "journal"));
+            var smtp = new CapturingSmtp();
+            var delivery = new StandaloneDelivery(library, users, settings, smtp, new BookEnricher(client), journal,
+                NullLogger<StandaloneDelivery>.Instance);
+            string deviceId = Assert.Single(settings.Read().Recipients).Id;
+            var request = new DeliveryRequest(user.Id, Guid.NewGuid(), deviceId, "original", Guid.NewGuid());
+            var (entry, _) = journal.Reserve(request, DeliveryMode.Smtp);
+
+            await delivery.ProcessAsync(entry, cancellation);
+
+            Assert.Equal(DeliveryStatus.SmtpAccepted, journal.FindByKey(user.Id, request.Key)?.Status);
+            Assert.Equal("reader@example.invalid", smtp.Recipient);
+            Assert.Equal(original, await File.ReadAllBytesAsync(fixture.Path, cancellation));
+            Assert.Equal(workLookupEnabled ? 1 : 0, http.Queries.Count);
+            using var messageBytes = new MemoryStream(Assert.IsType<byte[]>(smtp.Message));
+            var message = await MimeMessage.LoadAsync(messageBytes, cancellation);
+            var attachment = Assert.IsType<MimePart>(Assert.Single(message.Attachments));
+            Assert.Equal("application/epub+zip", attachment.ContentType.MimeType);
+            Assert.Equal(Path.GetFileName(fixture.Path), attachment.FileName);
+            using var epubBytes = new MemoryStream();
+            Assert.NotNull(attachment.Content);
+            await attachment.Content.DecodeToAsync(epubBytes, cancellation);
+            if (!workLookupEnabled)
+            {
+                Assert.Equal(original, epubBytes.ToArray());
+                return;
+            }
+
+            epubBytes.Position = 0;
+            var metadata = BookEnricherTests.ReadMetadata(epubBytes);
+            XNamespace dc = "http://purl.org/dc/elements/1.1/";
+            Assert.Equal("A story & more.", Assert.Single(metadata.Elements(dc + "description")).Value);
+            Assert.Equal("urn:uuid:delivery-fixture", Assert.Single(metadata.Elements(dc + "identifier")).Value);
+            Assert.Empty(metadata.Elements(dc + "publisher"));
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
+    }
+
     private static async Task AssertServiceForbidden(
         DeliveryRouter router, DeliveryJournal journal, User user, Guid bookId, CancellationToken cancellationToken)
     {
@@ -208,6 +281,23 @@ public sealed class StandaloneDeliveryTests
 
             displaceJournal();
             return Task.FromResult(true);
+        }
+    }
+
+    private sealed class CapturingSmtp : IStandaloneSmtpTransport
+    {
+        public string? Recipient { get; private set; }
+        public byte[]? Message { get; private set; }
+
+        public async Task<bool> SendAsync(
+            SmtpSettings settings, string recipientAddress, MimeMessage message, Action onSubmitting, CancellationToken cancellationToken)
+        {
+            onSubmitting();
+            Recipient = recipientAddress;
+            using var messageBytes = new MemoryStream();
+            await message.WriteToAsync(messageBytes, cancellationToken);
+            Message = messageBytes.ToArray();
+            return true;
         }
     }
 

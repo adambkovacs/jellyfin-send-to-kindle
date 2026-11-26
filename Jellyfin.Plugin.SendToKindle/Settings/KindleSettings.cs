@@ -48,6 +48,7 @@ public sealed class KindleSettings
     public SmtpSettings Smtp { get; init; } = new();
     public IReadOnlyList<RecipientSettings> Recipients { get; init; } = [];
     public bool GoogleBooksEnabled { get; init; }
+    public bool? GoogleBooksWorkLookupEnabled { get; init; }
     public string? GoogleBooksApiKey { get; init; }
 }
 

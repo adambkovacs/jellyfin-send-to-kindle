@@ -9,11 +9,11 @@
 
 Send EPUB and PDF books from Jellyfin Web to your Kindle through your own mail provider. Choose a device by name and fill in missing EPUB credits before the book leaves Jellyfin.
 
-[Install on Jellyfin 12.4](#install) · [Download v2.0.0.1](https://github.com/adambkovacs/jellyfin-send-to-kindle/releases/tag/v2.0.0.1) · [Set Kindle access](#kindle-access) · [Project site](https://adambkovacs.github.io/jellyfin-send-to-kindle/) · [Delivery API](docs/delivery-v1.md)
+[Install on Jellyfin 12.4](#install) · [Download v2.1.0.0](https://github.com/adambkovacs/jellyfin-send-to-kindle/releases/tag/v2.1.0.0) · [Set Kindle access](#kindle-access) · [Project site](https://adambkovacs.github.io/jellyfin-send-to-kindle/) · [Delivery API](docs/delivery-v1.md)
 
 ## Fill in missing EPUB credits before sending
 
-Books to Kindle can use an EPUB's ISBN to look up its author in Google Books and add the credit to the copy you send. It can also fill in a missing publisher or subject from the same record.
+An EPUB can reach your Kindle with a blank author or description. Books to Kindle can fill those fields on the copy you send. A verified ISBN match can also supply a missing title, publisher or subject.
 
 <a href="docs/assets/edition-proof-v2-still.svg" title="Open the still illustration">
 <picture>
@@ -22,12 +22,14 @@ Books to Kindle can use an EPUB's ISBN to look up its author in Google Books and
 </picture>
 </a>
 
-In **SMTP mail server** mode, open **Book metadata**, enable Google Books lookup, and enter your Google Books API key. The plugin sends the ISBN to Google Books and checks the returned ISBN and title against the EPUB on your server. It fills missing author, publisher and subject fields and sends the original if it cannot confirm a single match. Existing fields are preserved, including empty metadata placeholders. Your library file stays intact, and PDFs go through as supplied.
+In **SMTP mail server** mode, open **Book metadata**, enable Google Books lookup, and enter your Google Books API key. The plugin sends the ISBN to Google Books and checks the result against the title or author in the EPUB. It keeps existing credits and sends the original if it cannot confirm a single match. Your library file stays intact, and PDFs go through as supplied.
+
+Enable **Also search by title and author** to let Jellyfin send those two fields to Google Books when the ISBN lookup leaves gaps. For example, a matching print record can supply a missing description for the Kindle copy while the EPUB keeps its own identifiers. The additional search is off by default.
 
 <details>
 <summary>What did the Jev book identification trial show?</summary>
 
-In a separate PDF trial, TypeSafe Jev identified the work from its title and author. The two ISBNs in the evidence belonged to the hardcover and EPUB, so Jev left the PDF edition unresolved. A direct catalog comparison reached the same conclusion. This was an identification experiment. The released plugin uses Google Books for EPUB enrichment and has no Jev setting.
+TypeSafe Jev identified the book in a PDF from its title and author. A direct catalog check confirmed the match. The PDF also listed ISBNs for the hardcover and EPUB. Those identifiers belong to those editions. Jev was part of this trial. The plugin uses Google Books for EPUB enrichment.
 
 </details>
 
@@ -40,7 +42,7 @@ https://www.iamparadox.dev/jellyfin/plugins/manifest.json
 https://adambkovacs.github.io/jellyfin-send-to-kindle/manifest.json
 ```
 
-1. Install **File Transformation 3.0.3.0** and **Books to Kindle 2.0.0.1**. Restart Jellyfin. [File Transformation release](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation/releases/tag/3.0.3.0)
+1. Install **File Transformation 3.0.3.0** and **Books to Kindle 2.1.0.0**. Restart Jellyfin. [File Transformation release](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation/releases/tag/3.0.3.0)
 2. Open **Dashboard → Plugins → My Plugins → Books to Kindle**. Choose **SMTP mail server**, enter your provider's SMTP settings, and add a label and Send-to-Kindle address for each device. Save the settings and select **Test saved connection**.
 3. Add your sender to Amazon's **Approved Personal Document Email List** for each Kindle. [Amazon sender approval](https://digprjsurvey.amazon.com/csad/help/node/GX9XLEVV8G4DB28H)
 4. Sign in to Jellyfin Web with an account that can download the book and send to the Kindle. Open the book, select **Send to Kindle**, choose a device, and select **Send**.
@@ -64,7 +66,7 @@ To roll back, uninstall version 2 and restart. Restore the previous version and 
 
 ## Kindle access
 
-In **SMTP mail server** mode on 2.0.0.1, an administrator can choose who can use each device. In the plugin dashboard, open **Kindle recipients**, select accounts under **Jellyfin users** for the device, and save.
+In **SMTP mail server** mode, an administrator can choose who can use each device. In the plugin dashboard, open **Kindle recipients**, select accounts under **Jellyfin users** for the device, and save.
 
 - Leave the list empty to allow Jellyfin administrators only.
 - Select specific accounts to grant access to those accounts. Include your administrator account if you want to send to that Kindle.

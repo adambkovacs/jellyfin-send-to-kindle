@@ -110,6 +110,33 @@ public sealed class KindleSettingsTests : IDisposable
     }
 
     [Fact]
+    public void WorkLookupDefaultsOffAndOlderDashboardSavesPreserveConsent()
+    {
+        var store = CreateStore();
+        string path = Path.Combine(_directory.FullName, "send-to-kindle-private-settings.json");
+        var smtp = new SmtpSettings { Host = "smtp.example.invalid", Sender = SyntheticAddress() };
+        File.WriteAllText(path, JsonSerializer.Serialize(new { Mode = DeliveryMode.Smtp, Smtp = smtp, GoogleBooksEnabled = true }));
+        Assert.True(store.Read().GoogleBooksEnabled);
+        Assert.False(store.Read().GoogleBooksWorkLookupEnabled);
+
+        KindleSettings Update(bool? workLookupEnabled) => new()
+        {
+            Revision = store.Read().Revision,
+            Mode = DeliveryMode.Smtp,
+            Smtp = smtp,
+            GoogleBooksEnabled = true,
+            GoogleBooksWorkLookupEnabled = workLookupEnabled,
+        };
+
+        Assert.Null(store.Save(Update(true), false, false));
+        Assert.True(CreateStore().Read().GoogleBooksWorkLookupEnabled);
+        Assert.Null(store.Save(Update(null), false, false));
+        Assert.True(CreateStore().Read().GoogleBooksWorkLookupEnabled);
+        Assert.Null(store.Save(Update(false), false, false));
+        Assert.False(CreateStore().Read().GoogleBooksWorkLookupEnabled);
+    }
+
+    [Fact]
     public async Task AdminReadRedactsSecretsAndNonAdminOrApiKeyCannotTestConnection()
     {
         KindleSettingsStore store = CreateStore();
@@ -137,11 +164,19 @@ public sealed class KindleSettingsTests : IDisposable
         Assert.Equal(20 * 1024 * 1024, response.RootElement.GetProperty("smtp").GetProperty("maxAttachmentBytes").GetInt64());
         Assert.True(response.RootElement.GetProperty("smtp").GetProperty("passwordConfigured").GetBoolean());
         Assert.True(response.RootElement.GetProperty("googleBooksKeyConfigured").GetBoolean());
+        Assert.False(response.RootElement.GetProperty("googleBooksWorkLookupEnabled").GetBoolean());
         Assert.Empty(response.RootElement.GetProperty("recipients")[0].GetProperty("allowedUserIds").EnumerateArray());
 
         byte[] body = JsonSerializer.SerializeToUtf8Bytes(new
         {
-            settings = CreateSettings(store.Read().Revision, "smtp.example.invalid", null, null),
+            settings = new
+            {
+                store.Read().Revision,
+                mode = DeliveryMode.Smtp,
+                smtp = new SmtpSettings { Host = "smtp.example.invalid", Sender = SyntheticAddress() },
+                googleBooksEnabled = true,
+                googleBooksWorkLookupEnabled = true,
+            },
             clearSmtpPassword = false,
             clearGoogleBooksKey = false,
         }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
@@ -150,7 +185,10 @@ public sealed class KindleSettingsTests : IDisposable
         controller.Request.Body = requestBody;
         var updated = Assert.IsType<ContentResult>(await controller.Put(cancellation));
         Assert.Equal(200, updated.StatusCode);
-        Assert.False(Assert.IsType<string>(updated.Content).Contains(testValue, StringComparison.Ordinal));
+        string updatedJson = Assert.IsType<string>(updated.Content);
+        Assert.False(updatedJson.Contains(testValue, StringComparison.Ordinal));
+        using JsonDocument updatedResponse = JsonDocument.Parse(updatedJson);
+        Assert.True(updatedResponse.RootElement.GetProperty("googleBooksWorkLookupEnabled").GetBoolean());
 
         controller.HttpContext.User = Principal(user.Id, isApiKey: true);
         Assert.Equal(403, Assert.IsType<StatusCodeResult>(controller.Get()).StatusCode);

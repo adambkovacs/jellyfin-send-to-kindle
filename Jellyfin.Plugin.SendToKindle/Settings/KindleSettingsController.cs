@@ -57,6 +57,7 @@ public sealed class KindleSettingsController(
                     jellyfinUserId = recipient.GrantedUsers.Count == 1 ? recipient.GrantedUsers[0] : (Guid?)null,
                 }),
                 settings.GoogleBooksEnabled,
+                googleBooksWorkLookupEnabled = settings.GoogleBooksWorkLookupEnabled == true,
                 googleBooksKeyConfigured = !string.IsNullOrEmpty(settings.GoogleBooksApiKey),
                 googleBooksKeyFromEnvironment = store.TracksGoogleEnvironmentKey,
             });

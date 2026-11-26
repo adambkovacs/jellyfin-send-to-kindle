@@ -73,7 +73,9 @@
             <section class="kindle-section" data-field="enrichment" aria-labelledby="kindle-enrichment-heading" hidden>
                 <h2 id="kindle-enrichment-heading">Book metadata</h2>
                 <label class="kindle-check"><input data-field="googleEnabled" type="checkbox"> Look up metadata with Google Books</label>
-                <p class="kindle-details">When a book contains an ISBN, Jellyfin can send that ISBN to Google Books over HTTPS. If the lookup fails, Jellyfin sends the original file.</p>
+                <p class="kindle-details">Search Google Books using the EPUB’s ISBN. Missing catalog fields are added to the outgoing copy.</p>
+                <label class="kindle-check"><input data-field="googleWorkEnabled" type="checkbox"> Also search by title and author</label>
+                <p class="kindle-details">Allow Jellyfin to send the EPUB’s title and author to Google Books when an ISBN search cannot identify it. A matching paperback or hardcover can supply a description or subject.</p>
                 <label>Google Books API key <input data-field="googleKey" type="password" maxlength="256" autocomplete="new-password"></label>
                 <div class="kindle-actions">
                     <span class="kindle-details" data-field="googleStatus"></span>
@@ -137,6 +139,7 @@
                 field('smtp').hidden = !smtp;
                 field('recipientSection').hidden = !smtp;
                 field('enrichment').hidden = !smtp;
+                field('googleWorkEnabled').disabled = busy || !field('googleEnabled').checked;
                 if (settings && !settings.smtp.passwordFromEnvironment && settings.smtp.passwordConfigured) {
                     const sameIdentity = field('host').value.trim().toLowerCase() === settings.smtp.host.toLowerCase()
                         && Number(field('port').value) === settings.smtp.port
@@ -234,6 +237,7 @@
                 field('transport').value = normalizedTransport(value.smtp.transport) === 0 ? 'StartTls' : 'Tls';
                 field('limit').value = value.smtp.maxAttachmentBytes / mib;
                 field('googleEnabled').checked = value.googleBooksEnabled;
+                field('googleWorkEnabled').checked = value.googleBooksWorkLookupEnabled === true;
                 displaySecret('password', 'passwordStatus', 'passwordClearRow', 'passwordClear', value.smtp.passwordConfigured, value.smtp.passwordFromEnvironment);
                 displaySecret('googleKey', 'googleStatus', 'googleClearRow', 'googleClear', value.googleBooksKeyConfigured, value.googleBooksKeyFromEnvironment);
                 rows.clear();
@@ -341,6 +345,7 @@
                         },
                         recipients: Array.from(rows.values(), read => read()),
                         googleBooksEnabled: field('googleEnabled').checked,
+                        googleBooksWorkLookupEnabled: field('googleWorkEnabled').checked,
                         googleBooksApiKey: field('googleKey').value || null
                     },
                     clearSmtpPassword: field('passwordClear').checked,
