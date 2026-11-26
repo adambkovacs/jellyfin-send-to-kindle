@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="460" viewBox="0 0 1200 460" role="img" aria-labelledby="title description">
+  <title id="title">Books to Kindle for Jellyfin</title>
+  <desc id="description">A coral book and a Kindle against an ink-green and parchment book jacket. A small paper parcel follows the route between them.</desc>
+  <defs>
+    <clipPath id="jacket"><rect width="1200" height="460" rx="12"/></clipPath>
+    <linearGradient id="ink" x2="1" y2="1">
+      <stop stop-color="#101f22"/>
+      <stop offset="1" stop-color="#213a32"/>
+    </linearGradient>
+    <linearGradient id="parchment" x2=".8" y2="1">
+      <stop stop-color="#f5e6c5"/>
+      <stop offset="1" stop-color="#dba55c"/>
+    </linearGradient>
+    <linearGradient id="cover" x2="1" y2="1">
+      <stop stop-color="#f88d6c"/>
+      <stop offset="1" stop-color="#bb4d3f"/>
+    </linearGradient>
+    <pattern id="cloth" width="6" height="6" patternUnits="userSpaceOnUse">
+      <path d="M0 0h6M1 0v6" stroke="#fff2ce" stroke-width=".5" opacity=".16"/>
+    </pattern>
+    <pattern id="stock" width="9" height="9" patternUnits="userSpaceOnUse">
+      <path d="M1 2h1m3 5h1" stroke="#5c3c23" stroke-width="1" opacity=".17"/>
+    </pattern>
+    <pattern id="screen" width="4" height="4" patternUnits="userSpaceOnUse">
+      <path d="M0 0h1m1 2h1" stroke="#294637" stroke-width=".5" opacity=".23"/>
+    </pattern>
+    <path id="spark" d="M0-9Q.8-.8 9 0 .8.8 0 9-.8.8-9 0-.8-.8 0-9Z"/>
+  </defs>
+  <style>
+    .parcel { opacity: 0; }
+    @media (prefers-reduced-motion: no-preference) {
+      .parcel {
+        offset-path: path("M827 304 C860 271 804 246 842 211 S889 173 921 162");
+        animation: dispatch 4s cubic-bezier(.36,.04,.38,1) .35s 1 both;
+      }
+    }
+    @keyframes dispatch {
+      0% { offset-distance: 0%; opacity: 0; }
+      12%, 84% { opacity: 1; }
+      100% { offset-distance: 100%; opacity: 0; }
+    }
+  </style>
+
+  <g clip-path="url(#jacket)">
+    <path fill="url(#ink)" d="M0 0h1200v460H0z"/>
+    <path fill="url(#cloth)" d="M0 0h603v460H0z"/>
+    <path fill="url(#parchment)" d="M603 0h597v460H603z"/>
+    <path fill="url(#stock)" d="M603 0h597v460H603z"/>
+    <rect x="20" y="19" width="1160" height="422" rx="4" fill="none" stroke="#bd8752" stroke-opacity=".67"/>
+    <path d="M39 19v422m554-441v460m10-460v460m8-460v460m550-441v422" stroke="#bd8752" stroke-opacity=".52"/>
+    <path d="M76 94h112m-112 272h455" stroke="#d8ac70" stroke-opacity=".68"/>
+    <path d="M76 94v22m455 228v22" stroke="#d8ac70" stroke-opacity=".68"/>
+    <text x="77" y="187" fill="#fff1d3" font-family="Georgia, 'Times New Roman', serif" font-size="92" letter-spacing="-3.4">Books to</text>
+    <text x="71" y="282" fill="#ff9a7a" font-family="Georgia, 'Times New Roman', serif" font-size="121" font-style="italic" letter-spacing="-4">Kindle</text>
+    <text x="78" y="330" fill="#f4d39e" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="5">FOR JELLYFIN</text>
+
+    <!-- Engraved arcs and rules behind the book and reader. -->
+    <g fill="none" stroke="#875032">
+      <path d="M628 383h507m-507 8h507" opacity=".7"/>
+      <path d="M662 367V224a230 164 0 0 1 460 0v143M676 367V224a216 150 0 0 1 432 0v143" opacity=".5"/>
+      <path d="M720 137a177 125 0 0 1 280-34M789 123a152 107 0 0 1 162-14M683 166l26 8m-38 19 26 5m-30 22 27 2m-27 25h26m414-57 26-8m-18 37 22-4m-18 33 22 1m-22 27 22 4" opacity=".45"/>
+    </g>
+    <g fill="#a74c38">
+      <use href="#spark" transform="translate(746 87)"/>
+      <use href="#spark" transform="translate(1095 112) scale(.7)"/>
+      <use href="#spark" transform="translate(1120 326) scale(1.1)"/>
+      <use href="#spark" transform="translate(851 133) scale(.6)"/>
+    </g>
+    <g fill="#815233">
+      <circle cx="766" cy="68" r="2"/><circle cx="720" cy="96" r="2"/>
+      <circle cx="1080" cy="127" r="1.8"/><circle cx="1136" cy="309" r="2"/>
+      <circle cx="1106" cy="344" r="2.2"/><circle cx="818" cy="145" r="1.5"/>
+    </g>
+
+    <!-- The sewn cover and visible page block. -->
+    <g transform="rotate(-13 751 272)">
+      <rect x="685" y="185" width="140" height="188" rx="7" fill="#4c2926" opacity=".27" transform="translate(7 7)"/>
+      <rect x="682" y="179" width="144" height="188" rx="7" fill="#742f2d"/>
+      <path d="M696 342h128v20H696a10 10 0 0 1 0-20z" fill="#ffe7ba"/>
+      <path d="M697 347h126m-126 5h120m-120 5h125" stroke="#c88a56" opacity=".8"/>
+      <rect x="682" y="171" width="144" height="174" rx="7" fill="url(#cover)"/>
+      <rect x="682" y="171" width="144" height="174" rx="7" fill="url(#cloth)"/>
+      <path d="M704 172v172m-10-166v159" stroke="#782f31" stroke-width="2" opacity=".68"/>
+      <path d="M683 197h20m-20 12h20m-20 100h20m-20 12h20" stroke="#702a2b" stroke-width="2"/>
+      <rect x="714" y="184" width="101" height="144" rx="3" fill="none" stroke="#f9d5a0" opacity=".82"/>
+      <rect x="718" y="189" width="93" height="134" rx="2" fill="none" stroke="#f9d5a0" opacity=".53"/>
+      <ellipse cx="764" cy="252" rx="33" ry="44" fill="#672e2f" fill-opacity=".36" stroke="#f9d5a0"/>
+      <path d="M764 246q-10-7-20-4v21q12-3 20 5 8-8 20-5v-21q-10-3-20 4v22m-21 10h42m-34 8h26" fill="none" stroke="#ffe3b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <use href="#spark" transform="translate(764 224) scale(.6)" fill="#ffe3b0"/>
+      <path d="M800 351h11v32l-5.5-5.5-5.5 5.5z" fill="#1c4940"/>
+    </g>
+
+    <!-- The ink screen repeats the sun and hills stamped on the jacket. -->
+    <g transform="rotate(9 995 253)">
+      <rect x="929" y="143" width="147" height="224" rx="16" fill="#4e3729" opacity=".26" transform="translate(7 7)"/>
+      <rect x="925" y="136" width="150" height="222" rx="15" fill="#102524" stroke="#112525" stroke-width="3"/>
+      <rect x="930" y="141" width="140" height="212" rx="11" fill="none" stroke="#668174"/>
+      <rect x="938" y="152" width="124" height="177" rx="3" fill="#e4e4bf"/>
+      <rect x="938" y="152" width="124" height="177" rx="3" fill="url(#screen)"/>
+      <rect x="947" y="161" width="106" height="158" rx="1" fill="none" stroke="#617d68" stroke-opacity=".65"/>
+      <circle cx="1004" cy="200" r="17" fill="#ac7652"/>
+      <path d="M948 230q18-18 37-12 11 4 27 2 20-4 40 7v21H948z" fill="#729080"/>
+      <path d="M948 240q21-12 41-5 19 7 36 0 12-5 27-.5v13H948z" fill="#34584d"/>
+      <path d="M959 270h82m-82 12h82m-82 12h61m-61 12h70" stroke="#506a59" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M994 342h12" stroke="#b4bf9f" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- The whole route stays visible when motion is disabled. -->
+    <path d="M827 304c33-33-23-58 15-93 26-23 47-38 79-49" fill="none" stroke="#984333" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 6"/>
+    <path d="m914 160 8 2-5 6" fill="none" stroke="#984333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <g class="parcel">
+      <circle r="16" fill="#f7e5bf" stroke="#a34b38" stroke-width="1.4"/>
+      <path d="M-6-8H2L6-4V8H-6Z" fill="#a34b38"/>
+      <path d="M1-7v4h4m-8 2h6m-6 3h6m-6 3h4" stroke="#f8e2b6" stroke-width="1" fill="none"/>
+    </g>
+  </g>
+</svg>

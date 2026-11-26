@@ -6,7 +6,7 @@
   <title>Jellyfin Send to Kindle | Books to Kindle for Jellyfin 12.4</title>
   <meta name="description" content="Send EPUB and PDF books from Jellyfin Web to your Kindle using your own SMTP account. Install Books to Kindle for Jellyfin 12.4.">
   <link rel="canonical" href="https://adambkovacs.github.io/jellyfin-send-to-kindle/">
-  <meta name="theme-color" content="#0e2424">
+  <meta name="theme-color" content="#f5eddd">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Jellyfin Send to Kindle">
   <meta property="og:title" content="Jellyfin Send to Kindle">
@@ -16,12 +16,12 @@
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="600">
-  <meta property="og:image:alt" content="Jellyfin to Kindle, with a lighthouse on a Kindle screen">
+  <meta property="og:image:alt" content="Jellyfin to Kindle, with a Kindle beside a window overlooking the water">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Jellyfin Send to Kindle">
   <meta name="twitter:description" content="Send EPUB and PDF books from Jellyfin Web to your Kindle using your own SMTP account. Install Books to Kindle for Jellyfin 12.4.">
   <meta name="twitter:image" content="https://adambkovacs.github.io/jellyfin-send-to-kindle/assets/social-card.jpg">
-  <meta name="twitter:image:alt" content="Jellyfin to Kindle, with a lighthouse on a Kindle screen">
+  <meta name="twitter:image:alt" content="Jellyfin to Kindle, with a Kindle beside a window overlooking the water">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/baskervville.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="site.css">
@@ -58,20 +58,27 @@
 
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
-      <img class="hero-image" src="assets/reading-room.webp" width="1440" height="720" alt="" fetchpriority="high">
       <div class="frame hero-inner">
-        <p class="kicker">A plugin for Jellyfin 12.4</p>
-        <h1 id="hero-title">From Jellyfin<br> <em>to Kindle</em></h1>
-        <p class="hero-lede">Send EPUB and PDF books from Jellyfin Web to your Kindle using your own SMTP account. Choose which Jellyfin users can send to each device.</p>
-        <div class="actions">
-          <a class="button" href="https://github.com/adambkovacs/jellyfin-send-to-kindle/releases/tag/v2.0.0.1">Download v2.0.0.1 <span aria-hidden="true">↓</span></a>
-          <a class="text-link" href="#setup">Check requirements</a>
+        <div class="hero-copy">
+          <p class="kicker">A plugin for Jellyfin 12.4</p>
+          <h1 id="hero-title">From Jellyfin<br> <em>to Kindle</em></h1>
+          <p class="hero-lede">Send EPUB and PDF books from Jellyfin Web to your Kindle using your own SMTP account. Choose which Jellyfin users can send to each device.</p>
+          <div class="actions">
+            <a class="button" href="https://github.com/adambkovacs/jellyfin-send-to-kindle/releases/tag/v2.0.0.1">Download v2.0.0.1 <span aria-hidden="true">↓</span></a>
+            <a class="text-link" href="#setup">Check requirements</a>
+          </div>
+        </div>
+        <div class="jacket" aria-hidden="true">
+          <div class="jacket-window">
+            <img class="hero-image" src="assets/reading-room.webp" width="1440" height="720" alt="" fetchpriority="high">
+          </div>
+          <img class="jacket-seal" src="assets/jacket-seal.svg" width="184" height="184" alt="">
         </div>
       </div>
     </section>
 
     <section class="workflow frame" id="workflow" aria-labelledby="workflow-title">
-      <div class="section-intro">
+      <div class="section-intro workflow-intro">
         <h2 id="workflow-title">Send a book</h2>
         <p>Open a book you can download in Jellyfin Web. The <strong>Send to Kindle</strong> dialog lists the devices you can use and the formats available for that book.</p>
       </div>
@@ -80,21 +87,21 @@
           <a href="assets/book-action.png" aria-label="Open full-size book detail screenshot">
             <img src="assets/book-action.png" width="1516" height="396" alt="The Send to Kindle button on a Jellyfin book page" loading="lazy">
           </a>
-          <figcaption><span>Select <strong>Send to Kindle</strong> on the book page.</span></figcaption>
+          <figcaption>Select <strong>Send to Kindle</strong> on the book page.</figcaption>
         </figure>
         <figure class="screen screen-chooser">
           <a href="assets/chooser.png" aria-label="Open full-size Send to Kindle dialog screenshot">
             <img src="assets/chooser.png" width="404" height="544" alt="The Send to Kindle dialog with device and format selectors" loading="lazy">
           </a>
-          <figcaption><span>Choose a Kindle, then select <strong>Send</strong>.</span></figcaption>
+          <figcaption>Choose a Kindle, then select <strong>Send</strong>.</figcaption>
         </figure>
-        <div class="route">
-          <img src="assets/delivery-route.svg" alt="Jellyfin sends the book through your mail provider to Kindle" width="960" height="280" loading="lazy">
-          <div class="route-copy">
-            <h3>Check delivery</h3>
-            <p>The dialog shows <strong>Accepted by mail provider</strong> once your provider accepts the email. Open the book in your Kindle library to confirm it arrived.</p>
-          </div>
+      </div>
+      <div class="route">
+        <div class="route-copy">
+          <h3>Check delivery</h3>
+          <p>The dialog shows <strong>Accepted by mail provider</strong> once your provider accepts the email. Open the book in your Kindle library to confirm it arrived.</p>
         </div>
+        <img src="assets/delivery-route.svg" alt="Jellyfin sends the book through your mail provider to Kindle" width="960" height="280" loading="lazy">
       </div>
     </section>
 
@@ -104,23 +111,25 @@
           <h2 id="setup-title">Install and configure</h2>
           <p>Use Jellyfin Server 12.4.0 with Jellyfin Web. Install <strong>Books to Kindle</strong> from the plugin catalog.</p>
           <a class="button button-outline" href="https://github.com/adambkovacs/jellyfin-send-to-kindle/tree/books/12.4#install">Read the install guide <span aria-hidden="true">↗</span></a>
-          <a class="catalog-link" href="assets/admin-settings.png">View SMTP settings screenshot</a>
           <a class="catalog-link" href="manifest.json">Jellyfin catalog manifest <span aria-hidden="true">↗</span></a>
         </div>
-        <dl class="requirements">
-          <div>
-            <dt>File Transformation</dt>
-            <dd>Install <a href="https://github.com/IAmParadox27/jellyfin-plugin-file-transformation/releases/tag/3.0.3.0">File Transformation 3.0.3.0</a> to add the Send to Kindle button to Jellyfin Web.</dd>
-          </div>
-          <div>
-            <dt>SMTP and Amazon sender approval</dt>
-            <dd>Enter your provider's SMTP settings in the plugin dashboard or use the Purelymail preset. Add your sender to <a href="https://digprjsurvey.amazon.com/csad/help/node/GX9XLEVV8G4DB28H">Amazon's Approved Personal Document Email List</a> for each Kindle.</dd>
-          </div>
-          <div>
-            <dt>Books and formats</dt>
-            <dd>Use a <a href="https://jellyfin.org/docs/general/server/media/books/">Jellyfin Books library</a> with EPUB or PDF files. Optional Google Books lookup uses the ISBN to fill in missing metadata in an EPUB copy.</dd>
-          </div>
-        </dl>
+        <div>
+          <dl class="requirements">
+            <div>
+              <dt>File Transformation</dt>
+              <dd>Install <a href="https://github.com/IAmParadox27/jellyfin-plugin-file-transformation/releases/tag/3.0.3.0">File Transformation 3.0.3.0</a> to add the Send to Kindle button to Jellyfin Web.</dd>
+            </div>
+            <div>
+              <dt>SMTP and Amazon sender approval</dt>
+              <dd>Enter your provider's SMTP settings in the plugin dashboard or use the Purelymail preset. Add your sender to <a href="https://digprjsurvey.amazon.com/csad/help/node/GX9XLEVV8G4DB28H">Amazon's Approved Personal Document Email List</a> for each Kindle.</dd>
+            </div>
+            <div>
+              <dt>Books and formats</dt>
+              <dd>Use a <a href="https://jellyfin.org/docs/general/server/media/books/">Jellyfin Books library</a> with EPUB or PDF files. Optional Google Books lookup uses the ISBN to fill in missing metadata in an EPUB copy.</dd>
+            </div>
+          </dl>
+          <a class="catalog-link" href="assets/admin-settings.png">View SMTP settings screenshot <span aria-hidden="true">↗</span></a>
+        </div>
       </div>
     </section>
 
