@@ -8,6 +8,14 @@
     "category": "General",
     "versions": [
       {
+        "version": "2.0.0.1",
+        "changelog": "Assign individual Kindles to Jellyfin users in Direct SMTP mode.",
+        "targetAbi": "12.4.0.0",
+        "sourceUrl": "https://github.com/adambkovacs/jellyfin-send-to-kindle/releases/download/v2.0.0.1/books-to-kindle_2.0.0.1.zip",
+        "checksum": "5990ca455c29aef1cd90fc841deae39d",
+        "timestamp": "2026-11-26T05:10:19Z"
+      },
+      {
         "version": "2.0.0.0",
         "changelog": "Set up standalone SMTP and Kindle devices in the Jellyfin admin dashboard.",
         "targetAbi": "12.4.0.0",

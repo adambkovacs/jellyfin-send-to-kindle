@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" width="960" height="280" role="img" aria-labelledby="title description">
   <title id="title">From Jellyfin Web to Kindle</title>
-  <desc id="description">A book travels from Jellyfin Web through a compatible private HTTPS delivery service to a configured Kindle.</desc>
+  <desc id="description">Jellyfin sends the book through your mail provider to Kindle.</desc>
   <style>
     .parcel { opacity: 0; }
     @media (prefers-reduced-motion: no-preference) {
