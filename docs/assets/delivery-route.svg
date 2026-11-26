@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" width="960" height="280" role="img" aria-labelledby="title description">
+  <title id="title">From Jellyfin Web to Kindle</title>
+  <desc id="description">A book travels from Jellyfin Web through a compatible private HTTPS delivery service to a configured Kindle.</desc>
+  <style>
+    .parcel { opacity: 0; }
+    @media (prefers-reduced-motion: no-preference) {
+      .parcel { animation: delivery 4.5s ease-in-out 0.45s 1 both; }
+    }
+    @keyframes delivery {
+      0% { transform: translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      44%, 52% { transform: translateX(291px); opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateX(582px); opacity: 0; }
+    }
+  </style>
+  <rect width="960" height="280" rx="8" fill="#102727"/>
+  <rect x="12.5" y="12.5" width="935" height="255" rx="3" fill="none" stroke="#739185" stroke-opacity=".48"/>
+  <g fill="none" stroke="#739185" stroke-opacity=".23" stroke-width="1.4">
+    <path d="M13 210c86-30 125 37 219 0s147-26 242 7 119-36 240-17 140 13 233-22"/>
+    <path d="M13 228c86-30 125 37 219 0s147-26 242 7 119-36 240-17 140 13 233-22"/>
+    <path d="M13 246c86-30 125 37 219 0s147-26 242 7 119-36 240-17 140 13 233-22"/>
+    <path d="M13 264c86-30 125 37 219 0s147-26 242 7 119-36 240-17 140 13 233-22"/>
+  </g>
+  <path d="M189 122h582" fill="none" stroke="#d4b581" stroke-opacity=".8" stroke-width="2" stroke-dasharray="4 8"/>
+  <g fill="#132e2d" stroke="#9fa993" stroke-width="1.5">
+    <circle cx="189" cy="122" r="49"/>
+    <circle cx="480" cy="122" r="49"/>
+    <circle cx="771" cy="122" r="49"/>
+  </g>
+  <g fill="none" stroke="#ecce9b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M189 108c-7-6-14-8-23-5v35c9-3 16-1 23 4 7-5 14-7 23-4v-35c-9-3-16-1-23 5Zm0 0v33m-17-28 9 1m-9 8 9 1m16-9 9-1m-9 10 9-1"/>
+    <path d="M461 122h38m-19-24.5c12.7 7.1 19.5 16.5 19.5 26.4 0 9.1-7.5 16.5-19.5 23.6-12-7.1-19.5-14.5-19.5-23.6 0-9.9 6.8-19.3 19.5-26.4Zm0 7.5v31"/>
+    <rect x="753.5" y="94.5" width="35" height="55" rx="3"/>
+    <path d="M760 105h22m-22 6h22m-22 6h19m-19 6h20m-11 18h4"/>
+  </g>
+  <g class="parcel">
+    <circle cx="189" cy="122" r="18" fill="#edcc94" stroke="#132e2d" stroke-width="3"/>
+    <path d="M184 122h10m-4-4 4 4-4 4" fill="none" stroke="#132e2d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g fill="#fff1d9" font-family="system-ui, sans-serif" font-size="31" font-weight="600" text-anchor="middle">
+    <text x="189" y="210">Jellyfin Web</text>
+    <text x="480" y="210">Mail provider</text>
+    <text x="771" y="210">Kindle</text>
+  </g>
+</svg>

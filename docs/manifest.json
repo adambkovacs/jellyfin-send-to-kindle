@@ -1,0 +1,20 @@
+[
+  {
+    "guid": "5b1ea50d-4836-478b-95d4-1e60d4016b0a",
+    "name": "Books to Kindle",
+    "overview": "Send books from Jellyfin Web to your Kindle",
+    "description": "Select a device from a Book page and send through your SMTP account or a compatible remote delivery service.",
+    "owner": "adambkovacs",
+    "category": "General",
+    "versions": [
+      {
+        "version": "2.0.0.0",
+        "changelog": "Set up standalone SMTP and Kindle devices in the Jellyfin admin dashboard.",
+        "targetAbi": "12.4.0.0",
+        "sourceUrl": "https://github.com/adambkovacs/jellyfin-send-to-kindle/releases/download/v2.0.0.0/books-to-kindle_2.0.0.0.zip",
+        "checksum": "9f55f965252757d7c1baf75df277ffb1",
+        "timestamp": "2026-11-26T00:52:22Z"
+      }
+    ]
+  }
+]
