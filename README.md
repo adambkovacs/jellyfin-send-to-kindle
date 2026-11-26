@@ -15,7 +15,7 @@ https://www.iamparadox.dev/jellyfin/plugins/manifest.json
 https://adambkovacs.github.io/jellyfin-send-to-kindle/manifest.json
 ```
 
-1. Install [File Transformation 3.0.3.0](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation/releases/tag/3.0.3.0) and **Books to Kindle 2.0.0.1**. Restart Jellyfin.
+1. Install **File Transformation 3.0.3.0** and **Books to Kindle 2.0.0.1**. Restart Jellyfin. [File Transformation release](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation/releases/tag/3.0.3.0)
 2. Open **Dashboard → Plugins → My Plugins → Books to Kindle**. Choose **SMTP mail server**, enter your provider's SMTP settings, and add a label and Send-to-Kindle address for each device. Save the settings and select **Test saved connection**.
 3. Add your sender to Amazon's **Approved Personal Document Email List** for each Kindle. [Amazon sender approval](https://digprjsurvey.amazon.com/csad/help/node/GX9XLEVV8G4DB28H)
 4. Sign in to Jellyfin Web with an account that can download the book and send to the Kindle. Open the book, select **Send to Kindle**, choose a device, and select **Send**.
@@ -65,7 +65,9 @@ The plugin uses outgoing mail. **Test saved connection** checks the connection a
 | --- | --- |
 | ![Send to Kindle button on a Jellyfin book page](docs/assets/book-action.png) | ![Kindle device and file format fields](docs/assets/chooser.png) |
 
-Administrators can disable a device in the dashboard to remove its label from the chooser. The dashboard keeps password and API key fields write-only. Protect the Jellyfin data directory and its backups.
+Administrators manage recipient addresses and credentials in the dashboard. Disable a device to remove its label from the chooser.
+
+Password and API key fields are write-only. Protect the Jellyfin data directory and its backups.
 
 In SMTP mode, receipts stay on disk so retries can recover after a restart. Receipt storage grows with use.
 
@@ -98,7 +100,7 @@ dotnet test
 
 ## Upstream and license
 
-Books to Kindle is a fork of [vitorpy/jellyfin-send-to-kindle](https://github.com/vitorpy/jellyfin-send-to-kindle), based on [upstream v1.0.0.5](https://github.com/vitorpy/jellyfin-send-to-kindle/releases/tag/v1.0.0.5). Both projects use the GNU General Public License, version 3 or later. [License notice](LICENSE) · [Full GPL text](COPYING)
+Books to Kindle is a fork of vitorpy/jellyfin-send-to-kindle, based on upstream v1.0.0.5. Both projects use the GNU General Public License, version 3 or later. [Upstream repository](https://github.com/vitorpy/jellyfin-send-to-kindle) · [Upstream release](https://github.com/vitorpy/jellyfin-send-to-kindle/releases/tag/v1.0.0.5) · [License notice](LICENSE) · [Full GPL text](COPYING)
 
 The November 2026 releases added Jellyfin 12.4 support, a device and format chooser, per-device access and retry handling. AI coding agents contributed most of the fork's development.
 

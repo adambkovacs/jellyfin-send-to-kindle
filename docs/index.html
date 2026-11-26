@@ -72,7 +72,10 @@
           <div class="jacket-window">
             <img class="hero-image" src="assets/reading-room.webp" width="1440" height="720" alt="" fetchpriority="high">
           </div>
-          <img class="jacket-seal" src="assets/jacket-seal.svg" width="184" height="184" alt="">
+          <picture>
+            <source srcset="assets/jacket-seal.svg#still" media="(prefers-reduced-motion: reduce)">
+            <img class="jacket-seal" src="assets/jacket-seal.svg" width="184" height="184" alt="">
+          </picture>
         </div>
       </div>
     </section>
@@ -95,13 +98,13 @@
           </a>
           <figcaption>Choose a Kindle, then select <strong>Send</strong>.</figcaption>
         </figure>
-      </div>
-      <div class="route">
-        <div class="route-copy">
-          <h3>Check delivery</h3>
-          <p>The dialog shows <strong>Accepted by mail provider</strong> once your provider accepts the email. Open the book in your Kindle library to confirm it arrived.</p>
+        <div class="route">
+          <div class="route-copy">
+            <h3>Check delivery</h3>
+            <p>The dialog shows <strong>Accepted by mail provider</strong> once your provider accepts the email. Open the book in your Kindle library to confirm it arrived.</p>
+          </div>
+          <img src="assets/delivery-route.svg" alt="Jellyfin sends the book through your mail provider to Kindle" width="960" height="280" loading="lazy">
         </div>
-        <img src="assets/delivery-route.svg" alt="Jellyfin sends the book through your mail provider to Kindle" width="960" height="280" loading="lazy">
       </div>
     </section>
 

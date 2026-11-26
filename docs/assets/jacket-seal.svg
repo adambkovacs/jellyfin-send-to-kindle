@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="184" height="184" viewBox="0 0 184 184" aria-hidden="true">
+<svg xmlns="http://www.w3.org/2000/svg" id="still" width="184" height="184" viewBox="0 0 184 184" aria-hidden="true">
   <style>
     @media (prefers-reduced-motion: no-preference) {
-      .ring {
+      :root:not(:target) .ring {
         transform-origin: 92px 92px;
         animation: set-seal 3.7s cubic-bezier(.22, .7, .2, 1) both;
       }
-      .folio {
+      :root:not(:target) .folio {
         animation: carry-folio 3.7s cubic-bezier(.22, .7, .2, 1) both;
       }
     }
