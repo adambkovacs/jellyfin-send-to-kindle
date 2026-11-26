@@ -8,6 +8,14 @@
     "category": "General",
     "versions": [
       {
+        "version": "2.1.0.0",
+        "changelog": "Fill missing EPUB titles, author credits and descriptions from Google Books. Optionally search by title and author across editions.",
+        "targetAbi": "12.4.0.0",
+        "sourceUrl": "https://github.com/adambkovacs/jellyfin-send-to-kindle/releases/download/v2.1.0.0/books-to-kindle_2.1.0.0.zip",
+        "checksum": "98357420af3c97aeb32851cea00f8fee",
+        "timestamp": "2026-11-26T18:31:02Z"
+      },
+      {
         "version": "2.0.0.1",
         "changelog": "Assign individual Kindles to Jellyfin users in Direct SMTP mode.",
         "targetAbi": "12.4.0.0",
