@@ -24,8 +24,8 @@
   <meta name="twitter:image:alt" content="From Jellyfin to Kindle beside an illustration of a book and an e-reader">
   <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/baskervville.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="site.css">
-  <script src="motion.js" defer></script>
+  <link rel="stylesheet" href="site.css?v=2">
+  <script src="motion.js?v=2" defer></script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -53,9 +53,6 @@
         <a href="#workflow">Send a book</a>
         <a href="#setup">Setup</a>
         <a class="nav-source" href="https://github.com/adambkovacs/jellyfin-send-to-kindle">GitHub <span aria-hidden="true">↗</span></a>
-        <button class="motion-toggle" type="button" aria-pressed="true" hidden>
-          <span class="motion-indicator" aria-hidden="true"></span> Motion
-        </button>
       </nav>
     </div>
   </header>
@@ -113,10 +110,10 @@
         <div class="metadata-copy" data-reveal>
           <h2 id="metadata-title">Send the author credit with the book</h2>
           <p>Some EPUBs arrive with a title and ISBN but no author. Books to Kindle can match that ISBN and title in Google Books and fill in the author, publisher or subject on the copy you send. Your library keeps the original file.</p>
-          <p>In SMTP mode, turn on Google Books lookup under <strong>Book metadata</strong> and enter your API key. If the match is uncertain, the plugin sends the book as it is.</p>
+          <p>In SMTP mode, turn on Google Books lookup under <strong>Book metadata</strong> and enter your API key. If the match is uncertain, the plugin sends the book as it is. Existing metadata fields, including empty placeholders, are preserved.</p>
         </div>
         <figure class="proof-plate" data-reveal>
-          <img src="assets/edition-proof-still.svg" data-motion-source="assets/edition-proof.svg"
+          <img src="assets/edition-proof-v2-still.svg" data-motion-source="assets/edition-proof-v2.svg#once"
                width="960" height="580" alt="An EPUB with a missing author credit is matched by ISBN and title. Google Books metadata is added to the outgoing copy." loading="lazy">
         </figure>
       </div>

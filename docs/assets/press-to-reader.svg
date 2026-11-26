@@ -113,16 +113,16 @@
     .leaf-c { transform: translate(823px,213px) rotate(13deg) scale(.43,.45); }
     .paper-runner, .ink-runner, .eink-pulse, .quiet-leaf { opacity: 0; }
     @media (prefers-reduced-motion: no-preference) {
-      .leaf-a { animation: folio-a 9s infinite; }
-      .leaf-b { animation: folio-b 9s infinite; }
-      .leaf-c { animation: folio-c 9s infinite; }
-      .quiet-leaf { animation: turn 9s infinite; }
+      .leaf-a { animation: folio-a 4.8s 1 both; }
+      .leaf-b { animation: folio-b 4.8s 1 both; }
+      .leaf-c { animation: folio-c 4.8s 1 both; }
+      .quiet-leaf { animation: turn 4.8s 1 both; }
       .paper-runner {
         offset-path: path("M531 428C623 405 620 223 736 190S847 252 929 185");
-        animation: courier 9s infinite;
+        animation: courier 4.8s 1 both;
       }
-      .ink-runner { animation: passing-ink 9s infinite; }
-      .eink-pulse { animation: impression 9s infinite; }
+      .ink-runner { animation: passing-ink 4.8s 1 both; }
+      .eink-pulse { animation: impression 4.8s 1 both; }
     }
     #still:target * { animation: none; }
 

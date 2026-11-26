@@ -16,10 +16,10 @@
   <style>
     .dispatch,.reply{opacity:0}
     @media (prefers-reduced-motion:no-preference){
-      :root:not(:target) .dispatch,:root:not(:target) .reply{offset-path:path('M178 126C257 46 344 46 424 126S631 201 728 126');offset-rotate:0deg;animation:carry 7.2s linear infinite}
+      :root:not(:target) .dispatch,:root:not(:target) .reply{offset-path:path('M178 126C257 46 344 46 424 126S631 201 728 126');offset-rotate:0deg;animation:carry 4.8s linear 1 both}
       :root:not(:target) .reply{animation-delay:.2s}
-      :root:not(:target) .postmark{transform-origin:424px 126px;animation:stamp 7.2s ease-in-out infinite}
-      :root:not(:target) .signal{animation:signal 7.2s ease-in-out infinite}
+      :root:not(:target) .postmark{transform-origin:424px 126px;animation:stamp 4.8s ease-in-out 1 both}
+      :root:not(:target) .signal{animation:signal 4.8s ease-in-out 1 both}
     }
     @keyframes carry{0%,6%{offset-distance:0%;opacity:0}12%{opacity:1}38%,49%{offset-distance:45%;opacity:1}79%{opacity:1}85%,100%{offset-distance:100%;opacity:0}}
     @keyframes stamp{0%,32%,57%,100%{transform:rotate(0deg)}43%{transform:rotate(-22deg)}}

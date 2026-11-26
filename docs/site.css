@@ -80,35 +80,7 @@ h3 { font-size: clamp(2.1rem, 3.45vw, 3.1rem); line-height: 1.05; letter-spacing
 .masthead nav a { display: inline-flex; align-items: center; gap: 0.3rem; min-height: 2.75rem; text-decoration: none; }
 .masthead nav a:is(:hover, :focus-visible), .footer a:is(:hover, :focus-visible) { color: var(--coral); }
 .masthead nav .nav-source { color: var(--coral); }
-.motion-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.42rem;
-  min-height: 2.75rem;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--night-copy);
-  font: inherit;
-  cursor: pointer;
-}
 
-.motion-toggle:is(:hover, :focus-visible) { color: var(--ivory); }
-.motion-indicator {
-  width: 0.58rem;
-  height: 0.68rem;
-  border-inline: 2px solid currentColor;
-  color: var(--coral);
-}
-
-.motion-toggle[aria-pressed="false"] .motion-indicator {
-  width: 0;
-  height: 0;
-  margin-right: 0.04rem;
-  border-block: 0.34rem solid transparent;
-  border-left: 0.52rem solid currentColor;
-  border-right: 0;
-}
 
 .hero {
   position: relative;

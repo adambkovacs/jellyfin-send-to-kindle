@@ -1,9 +1,11 @@
 # Books to Kindle for Jellyfin
 
+<a href="docs/assets/reading-jacket-v2-still.svg" title="Open the still illustration">
 <picture>
   <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/reading-jacket-v2-still.svg">
-  <img src="docs/assets/reading-jacket-v2.svg" alt="A vermilion book and an e-reader share the same engraving">
+  <img src="docs/assets/reading-jacket-v3.svg" alt="A vermilion book and an e-reader share the same engraving">
 </picture>
+</a>
 
 Send EPUB and PDF books from Jellyfin Web to your Kindle through your own mail provider. Choose a device by name and fill in missing EPUB credits before the book leaves Jellyfin.
 
@@ -13,12 +15,14 @@ Send EPUB and PDF books from Jellyfin Web to your Kindle through your own mail p
 
 Books to Kindle can use an EPUB's ISBN to look up its author in Google Books and add the credit to the copy you send. It can also fill in a missing publisher or subject from the same record.
 
+<a href="docs/assets/edition-proof-v2-still.svg" title="Open the still illustration">
 <picture>
-  <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/edition-proof-still.svg">
-  <img src="docs/assets/edition-proof.svg" alt="A library EPUB's ISBN goes to Google Books, and the matching record supplies the outgoing copy's missing author credit">
+  <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/edition-proof-v2-still.svg">
+  <img src="docs/assets/edition-proof-v2.svg" alt="A library EPUB's ISBN goes to Google Books, and the matching record supplies the outgoing copy's missing author credit">
 </picture>
+</a>
 
-In **SMTP mail server** mode, open **Book metadata**, enable Google Books lookup, and enter your Google Books API key. The plugin sends the ISBN to Google Books and checks the returned ISBN and title against the EPUB on your server. It keeps existing credits and sends the original if it cannot confirm a single match. Your library file stays intact, and PDFs go through as supplied.
+In **SMTP mail server** mode, open **Book metadata**, enable Google Books lookup, and enter your Google Books API key. The plugin sends the ISBN to Google Books and checks the returned ISBN and title against the EPUB on your server. It fills missing author, publisher and subject fields and sends the original if it cannot confirm a single match. Existing fields are preserved, including empty metadata placeholders. Your library file stays intact, and PDFs go through as supplied.
 
 <details>
 <summary>What did the Jev book identification trial show?</summary>
@@ -82,9 +86,11 @@ The plugin uses outgoing mail. **Test saved connection** checks the connection a
 
 ## Sending and delivery status
 
-| Book page | Device and format chooser |
-| --- | --- |
-| ![Send to Kindle button on a Jellyfin book page](docs/assets/book-action.png) | ![Kindle device and file format fields](docs/assets/chooser.png) |
+Select **Send to Kindle** on the book page, then choose a device.
+
+[![Send to Kindle button on a Jellyfin book page](docs/assets/book-action-detail.png)](docs/assets/book-action.png)
+
+[![Kindle device and file format fields](docs/assets/chooser.png)](docs/assets/chooser.png)
 
 Administrators manage recipient addresses and credentials in the dashboard. Disable a device to remove its label from the chooser.
 
@@ -98,7 +104,7 @@ The service supplies devices, formats and job status. Configure metadata lookup,
 
 **Accepted by mail provider** confirms SMTP submission. Open the document in the Kindle library to verify delivery.
 
-After a lost response, use **Retry** or **Check previous request** to recover the same job. An **unknown** status means the mail provider may have accepted the message. Check the receiving side before sending again.
+After a lost response, use **Retry** or **Check previous request** in the same browser tab to recover the same job. An independent tab has its own request history. If the earlier request is unavailable, verify delivery before sending again. An **unknown** status means the mail provider may have accepted the message. Check the receiving side before sending again.
 
 ## Troubleshooting
 
