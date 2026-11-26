@@ -7,6 +7,7 @@ using Jellyfin.Plugin.SendToKindle.Enrichment;
 using Jellyfin.Plugin.SendToKindle.Settings;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using MimeKit;
 
@@ -14,11 +15,15 @@ namespace Jellyfin.Plugin.SendToKindle.Tests;
 
 public sealed class StandaloneDeliveryTests
 {
-    [Fact]
-    public async Task LostResponseIsUnknownAndReplayStaysLocalAfterModeChange()
+    [Theory]
+    [InlineData(false, "unknown")]
+    [InlineData(true, "smtp_accepted")]
+    public async Task ReplayKeepsTheOriginalReceiptAndDoesNotSendAgain(bool journalTemporarilyUnavailable, string expectedStatus)
     {
+        Assert.SkipWhen(journalTemporarilyUnavailable && OperatingSystem.IsWindows(),
+            "Windows locks the journal directory while its lease is open.");
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
-        timeout.CancelAfter(TimeSpan.FromSeconds(10));
+        timeout.CancelAfter(TimeSpan.FromSeconds(20));
         CancellationToken cancellationToken = timeout.Token;
         var user = new User("test-user", "test-auth", "test-reset");
         user.SetPermission(PermissionKind.IsAdministrator, true);
@@ -35,12 +40,15 @@ public sealed class StandaloneDeliveryTests
             IUserManager users = Proxy<IUserManager>((_, arguments) =>
                 Equals(user.Id, arguments?[0]) ? user : null);
             var settings = new SettingsStub(user.Id);
-            var smtp = new LosingSmtpResponse();
-            using var journal = new DeliveryJournal(Path.Combine(directory, "journal"));
+            string journalPath = Path.Combine(directory, "journal");
+            string displacedJournalPath = Path.Combine(directory, "displaced");
+            var smtp = new SyntheticSmtp(journalTemporarilyUnavailable ? () => Directory.Move(journalPath, displacedJournalPath) : null);
+            var logger = new PersistenceRetryLogger();
+            using var journal = new DeliveryJournal(journalPath);
             using var enrichmentHttp = new HttpClient();
             using var remote = new RemoteDeliveryClient(null, null, new HttpClientHandler());
             var local = new StandaloneDelivery(library, users, settings, smtp, new BookEnricher(enrichmentHttp), journal,
-                NullLogger<StandaloneDelivery>.Instance);
+                logger);
             using var router = new DeliveryRouter(settings, remote, local, journal, NullLogger<DeliveryRouter>.Instance);
             await router.StartAsync(cancellationToken);
             try
@@ -52,8 +60,15 @@ public sealed class StandaloneDeliveryTests
                 var submission = await router.SubmitAsync(user.Id, bookId, "personal", "original", key, cancellationToken);
                 Assert.False(submission.IsReplay);
                 Guid jobId = Guid.Parse(submission.Receipt.JobId);
+                if (journalTemporarilyUnavailable)
+                {
+                    await logger.RetryStarted.Task.WaitAsync(cancellationToken);
+                    Assert.Equal("submitting", (await router.GetStatusAsync(user.Id, jobId, cancellationToken)).Status);
+                    Directory.Move(displacedJournalPath, journalPath);
+                }
+
                 DeliveryReceipt receipt = await router.GetStatusAsync(user.Id, jobId, cancellationToken);
-                while (receipt.Status != "unknown")
+                while (receipt.Status != expectedStatus)
                 {
                     await Task.Delay(10, cancellationToken);
                     receipt = await router.GetStatusAsync(user.Id, jobId, cancellationToken);
@@ -118,7 +133,7 @@ public sealed class StandaloneDeliveryTests
         public string? Save(KindleSettings requested, bool clearPassword, bool clearGoogleKey) => throw new NotSupportedException();
     }
 
-    private sealed class LosingSmtpResponse : IStandaloneSmtpTransport
+    private sealed class SyntheticSmtp(Action? displaceJournal) : IStandaloneSmtpTransport
     {
         public int Attempts { get; private set; }
 
@@ -127,7 +142,31 @@ public sealed class StandaloneDeliveryTests
         {
             onSubmitting();
             Attempts++;
-            throw new IOException("Synthetic connection drop.");
+            if (displaceJournal is null)
+            {
+                throw new IOException("Synthetic connection drop.");
+            }
+
+            displaceJournal();
+            return Task.FromResult(true);
+        }
+    }
+
+    private sealed class PersistenceRetryLogger : ILogger<StandaloneDelivery>
+    {
+        public TaskCompletionSource RetryStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(
+            LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        {
+            if (formatter(state, exception).Contains("Retrying the journal write.", StringComparison.Ordinal))
+            {
+                RetryStarted.TrySetResult();
+            }
         }
     }
 }
