@@ -108,6 +108,14 @@
       </div>
     </section>
 
+    <section class="frame metadata-feature" aria-labelledby="metadata-title">
+      <div class="section-intro">
+        <h2 id="metadata-title">Send the author credit with the book</h2>
+        <p>Some EPUBs arrive with a title and ISBN but no author. Books to Kindle can match that ISBN and title in Google Books and fill in the author, publisher or subject on the copy you send. Your library keeps the original file.</p>
+      </div>
+      <p>In SMTP mode, turn on Google Books lookup under <strong>Book metadata</strong> and enter your API key. If the match is uncertain, the plugin sends the book as it is.</p>
+    </section>
+
     <section class="setup" id="setup" aria-labelledby="setup-title">
       <div class="frame setup-grid">
         <div class="section-intro setup-intro">
@@ -128,7 +136,7 @@
             </div>
             <div>
               <dt>Books and formats</dt>
-              <dd>Use a <a href="https://jellyfin.org/docs/general/server/media/books/">Jellyfin Books library</a> with EPUB or PDF files. Optional Google Books lookup uses the ISBN to fill in missing metadata in an EPUB copy.</dd>
+              <dd>Use a <a href="https://jellyfin.org/docs/general/server/media/books/">Jellyfin Books library</a> with EPUB or PDF files.</dd>
             </div>
           </dl>
           <a class="catalog-link" href="assets/admin-settings.png">View SMTP settings screenshot <span aria-hidden="true">↗</span></a>
@@ -139,6 +147,10 @@
     <section class="faq frame" aria-labelledby="faq-title">
       <h2 id="faq-title">Common questions</h2>
       <div class="faq-list">
+        <details>
+          <summary>Can Jev identify a book or its edition?</summary>
+          <p>In a separate PDF trial, TypeSafe Jev identified the work from the title and author. It left the PDF edition open because the available ISBNs belonged to the hardcover and EPUB. A catalog check gave the same answer. Jev remains experimental. The plugin ships with Google Books lookup for EPUBs.</p>
+        </details>
         <details>
           <summary>Access for Jellyfin users</summary>
           <p>In SMTP mode, open <strong>Jellyfin users</strong> for each Kindle. Leave the list empty to allow administrators only, or select the accounts that can use that Kindle. Users need permission to download the book.</p>

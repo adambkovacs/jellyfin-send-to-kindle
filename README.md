@@ -2,9 +2,22 @@
 
 ![A coral book and a Kindle connected by a dotted route](docs/assets/reading-jacket.svg)
 
-Send EPUB and PDF books from Jellyfin Web to your Kindle through your own mail provider. Add each Kindle in the plugin dashboard, then choose its label when you send a book.
+Send EPUB and PDF books from Jellyfin Web to your Kindle through your own mail provider. Choose a device by name and fill in missing EPUB credits before the book leaves Jellyfin.
 
 [Install on Jellyfin 12.4](#install) · [Download v2.0.0.1](https://github.com/adambkovacs/jellyfin-send-to-kindle/releases/tag/v2.0.0.1) · [Set Kindle access](#kindle-access) · [Project site](https://adambkovacs.github.io/jellyfin-send-to-kindle/) · [Delivery API](docs/delivery-v1.md)
+
+## Fill in missing EPUB credits before sending
+
+An EPUB can have a title and an ISBN but no author credit. Books to Kindle can look up that ISBN in Google Books and add the author to the copy you send. It can also fill in a missing publisher or subject using the same catalog record.
+
+In **SMTP mail server** mode, open **Book metadata**, enable Google Books lookup, and enter your Google Books API key. The search sends the ISBN to Google Books and keeps the book file on your server. The plugin checks the returned ISBN and title against the EPUB and keeps existing credits. If it cannot confirm a single match, it sends the original. Your Jellyfin library file stays intact, and PDFs go through as supplied.
+
+<details>
+<summary>What did the Jev book identification trial show?</summary>
+
+In a separate PDF trial, TypeSafe Jev identified the work from its title and author. The two ISBNs in the evidence belonged to the hardcover and EPUB, so Jev left the PDF edition unresolved. A direct catalog comparison reached the same conclusion. This was an identification experiment. The released plugin uses Google Books for EPUB enrichment and has no Jev setting.
+
+</details>
 
 ## Install
 
@@ -59,7 +72,7 @@ Version 2.0.0.0 restricts sending to Jellyfin administrators. **External deliver
 
 The plugin uses outgoing mail. **Test saved connection** checks the connection and authentication without sending a book. Choose a provider that supports your installation's SMTP authentication. [Purelymail settings](https://support.purelymail.com/support/solutions/articles/159000430778-server-settings-imap-smtp-pop3-and-managesieve-protocols) · [Purelymail app passwords](https://purelymail.com/docs/twoFactorAuthentication)
 
-## Sending, status and metadata
+## Sending and delivery status
 
 | Book page | Device and format chooser |
 | --- | --- |
@@ -70,10 +83,6 @@ Administrators manage recipient addresses and credentials in the dashboard. Disa
 Password and API key fields are write-only. Protect the Jellyfin data directory and its backups.
 
 In SMTP mode, receipts stay on disk so retries can recover after a restart. Receipt storage grows with use.
-
-SMTP mode sends the book in its source format. Enable lookup in **Book metadata** and enter a Google Books API key. The plugin uses an EPUB's ISBN to fill in missing metadata on the copy it sends.
-
-If lookup fails or the result is ambiguous, the plugin sends the original attachment. It preserves standalone PDFs and leaves the library file intact.
 
 To use **External delivery service** mode, set `KINDLE_DELIVERY_BASE_URL` and `KINDLE_DELIVERY_TOKEN` on the Jellyfin server. Select the mode in the plugin dashboard.
 
