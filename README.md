@@ -1,8 +1,8 @@
 # Books to Kindle for Jellyfin
 
 <picture>
-  <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/reading-jacket-still.svg">
-  <img src="docs/assets/reading-jacket.svg" alt="A vermilion book and an e-reader share the same engraving">
+  <source media="(prefers-reduced-motion: reduce)" srcset="docs/assets/reading-jacket-v2-still.svg">
+  <img src="docs/assets/reading-jacket-v2.svg" alt="A vermilion book and an e-reader share the same engraving">
 </picture>
 
 Send EPUB and PDF books from Jellyfin Web to your Kindle through your own mail provider. Choose a device by name and fill in missing EPUB credits before the book leaves Jellyfin.
